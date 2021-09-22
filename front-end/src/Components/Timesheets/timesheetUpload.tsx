@@ -3,12 +3,12 @@ import { Form } from 'carbon-components-react';
 import { FileUploader } from 'carbon-components-react';
 import { Button } from 'carbon-components-react';
 import { TextInput } from 'carbon-components-react';
-import FilterableMultiSelect from 'carbon-components-react/lib/components/FilterableMultiSelect';
-import { Employee, getAllEmployees } from '../Employee/EmployeesList/employee.resource';
+import { getAllEmployees } from '../Timesheets/timesheet.resource';
+import FilterableMultiSelect from 'carbon-components-react/lib/components/MultiSelect/FilterableMultiSelect';
 
 const TimesheetUpload: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File>();
-  const [employees, setEmployees] = useState<Array<Employee>>([]);
+  const [employees, setEmployees] = useState<Array<any>>([]);
   const [selectEmployees, setSelectEmployees] = useState<Array<string>>([]);
   const [month, setMonth] = useState('');
 
@@ -37,7 +37,7 @@ const TimesheetUpload: React.FC = () => {
   };
 
   useMemo(() => {
-    getAllEmployees().then((res) => {
+    getAllEmployees().then((res: any[]) => {
       const results = res.map((employee: any) => {
         return {
           id: employee.id,
@@ -55,10 +55,12 @@ const TimesheetUpload: React.FC = () => {
         <FilterableMultiSelect
           id=""
           items={employees}
-          itemToString={(item) => (item ? `${item.pfNumber + ' - ' + item.name}` : '')}
+          itemToString={(item: { pfNumber: string; name: string }) =>
+            item ? `${item.pfNumber + ' - ' + item.name}` : ''
+          }
           placeholder="Select Employee(s)"
           selectionFeedback="fixed"
-          onChange={(e) => setSelectEmployees(e.selectedItems)}
+          onChange={(e: any) => setSelectEmployees(e.selectedItems)}
         />
         <TextInput
           id=""
