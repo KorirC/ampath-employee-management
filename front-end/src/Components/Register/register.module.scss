@@ -1,0 +1,44 @@
+@import "~carbon-components/css/carbon-components.min.css";
+
+.h1 {
+  padding-bottom: 2rem;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 32px;
+  text-align: center;
+}
+
+.registerform {
+  margin: 5rem;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: whitesmoke;
+  font-weight: bold;
+  border: 3px solid #f1f1f1;
+  width: 30rem;
+  height: fit-content;
+  border-radius: 1px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  position: relative;
+  padding: 5rem;
+  font-size: 14px;
+  line-height: 24px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.password,
+.email,
+.username {
+  margin-bottom: 0.5rem;
+}
+
+.registerbutton {
+  margin-top: 2rem;
+  margin-left: auto;
+}
+
+.link {
+  margin-top: 2rem;
+  margin-right: 1rem;
+}
