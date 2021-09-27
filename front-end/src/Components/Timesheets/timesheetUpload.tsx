@@ -1,39 +1,42 @@
-import React, { useMemo, useState } from 'react';
-import { Form } from 'carbon-components-react';
-import { FileUploader } from 'carbon-components-react';
-import { Button } from 'carbon-components-react';
-import { TextInput } from 'carbon-components-react';
-import { getAllEmployees } from '../Timesheets/timesheet.resource';
-import FilterableMultiSelect from 'carbon-components-react/lib/components/MultiSelect/FilterableMultiSelect';
+import React, { useMemo, useState } from "react";
+import { Form } from "carbon-components-react";
+import { FileUploader } from "carbon-components-react";
+import { Button } from "carbon-components-react";
+import { TextInput } from "carbon-components-react";
+import {
+  getAllEmployees,
+  uploadTimesheet,
+} from "../Timesheets/timesheet.resource";
+import FilterableMultiSelect from "carbon-components-react/lib/components/MultiSelect/FilterableMultiSelect";
+import axios from "axios";
 
 const TimesheetUpload: React.FC = () => {
-  const [selectedFiles, setSelectedFiles] = useState<File>();
+  const [selectedFiles, setSelectedFiles] = useState<any>();
   const [employees, setEmployees] = useState<Array<any>>([]);
-  const [selectEmployees, setSelectEmployees] = useState<Array<string>>([]);
-  const [month, setMonth] = useState('');
+  const [selectEmployees, setSelectEmployees] = useState([]);
+  const [month, setMonth] = useState("");
 
   const handleImageChange = (e: any) => {
-    const fileList = e.target.files[0];
-    if (!fileList) return;
-    setSelectedFiles(fileList);
+    setSelectedFiles(e.target.files[0]);
   };
+  // console.log(selectEmployees);
+  const d = selectEmployees.map((i: any) => {
+    return i.pfNumber;
+  });
 
   const upload = () => {
-    if (selectedFiles) {
-      const formData = new FormData();
-      formData.append('image', selectedFiles);
+    let data = new FormData();
+    data.append("pfNumber", JSON.stringify(d));
+    data.append("month", JSON.stringify(month));
+    data.append("filename", selectedFiles.name);
+    data.append("upload", selectedFiles);
 
-      // fetch('http://', {
-      //   method: 'POST',
-      //   body: formData,
-      //   headers: {
-      //     Accept: 'multipart/formdata',
-      //   },
-      // })
-      //   .then((res) => res.json())
-      //   .then((res) => console.log(res))
-      //   .catch((error) => console.log(error));
+    for (var key of data.entries()) {
+      console.log(key[0] + ", " + key[1]);
     }
+    uploadTimesheet(data).then((res: any) => {
+      console.log(res);
+    });
   };
 
   useMemo(() => {
@@ -51,12 +54,12 @@ const TimesheetUpload: React.FC = () => {
 
   return (
     <>
-      <Form style={{ marginTop: '3rem' }}>
+      <Form style={{ marginTop: "3rem" }} encType="multipart/form-data">
         <FilterableMultiSelect
           id=""
           items={employees}
           itemToString={(item: { pfNumber: string; name: string }) =>
-            item ? `${item.pfNumber + ' - ' + item.name}` : ''
+            item ? `${item.pfNumber + " - " + item.name}` : ""
           }
           placeholder="Select Employee(s)"
           selectionFeedback="fixed"
@@ -65,7 +68,7 @@ const TimesheetUpload: React.FC = () => {
         <TextInput
           id=""
           labelText="Month"
-          type="month"
+          type="date"
           className="form-control"
           min="2018-03"
           onChange={(e) => setMonth(e.target.value)}
@@ -73,15 +76,15 @@ const TimesheetUpload: React.FC = () => {
         />
         <FileUploader
           buttonKind="secondary"
-          accept={['.jpg', '.png']}
+          accept={[".jpg", ".png"]}
           buttonLabel="Add file"
           iconDescription="Clear file"
           filenameStatus="edit"
-          multiple={true}
+          multiple={false}
           onChange={handleImageChange}
         />
 
-        <Button onClick={upload} kind="secondary" style={{ marginTop: '1rem' }}>
+        <Button onClick={upload} kind="secondary" style={{ marginTop: "1rem" }}>
           Upload TimeSheet
         </Button>
       </Form>
