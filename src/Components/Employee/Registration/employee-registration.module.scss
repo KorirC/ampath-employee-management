@@ -1,0 +1,29 @@
+.form {
+    position: relative;
+    margin-top: 20px;
+    margin-left: 250px;
+    padding: 20px;
+    border-left: 1px solid rgb(21, 109, 131);
+}
+
+.form .header{
+    padding: 5px;
+    margin: 10px;
+    border-bottom: 1px solid rgb(21, 109, 131);
+}
+
+.form .submitBtn {
+    margin: 10px;
+}
+
+.form .errorMsg {
+    color: tomato;
+    font-size: small;
+}
+
+.toast {
+    position: fixed;
+    z-index: 4;
+    right: 0;
+    top: 0;
+}

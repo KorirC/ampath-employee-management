@@ -1,0 +1,45 @@
+.profileStyles {
+    margin: 100px;
+    border: 1px solid black;
+    margin-top: 5%;
+}
+
+.headingStyle {
+    text-align: center;
+    font-weight: bolder;
+    margin-top: 20px;
+}
+
+.profileItems {
+    padding: 50px;
+}
+
+.name {
+    margin: 15px;
+    padding: 5px;
+    font-size: larger;
+}
+
+.employeedetails {
+    color: green;
+}
+
+.btn {
+    margin: 50px;
+    padding: 5px;
+    margin-top: 0%;
+}
+
+.bio {
+    margin: 50px;
+    padding: 5px;
+    font-size: larger;
+    border: 0.1px solid grey;
+}
+
+.contacts {
+    margin: 50px;
+    padding: 5px;
+    font-size: larger;
+    border: 0.1px solid grey;
+}
