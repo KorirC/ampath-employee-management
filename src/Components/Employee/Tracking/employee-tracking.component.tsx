@@ -15,16 +15,16 @@ import {
 } from 'carbon-components-react';
 import { FormValues, EmployeeTrackingInputProps } from './employee-tracking-types';
 import { validationSchema } from './employee-tracking-validation';
+import { saveEmployeeTrackingInformation } from './employee-tracking-resource';
+import styles from './employee-tracking.module.scss';
 import {
+  getBudgets,
+  getCounties,
   getDepartments,
+  getPrograms,
   getProjects,
   getSites,
-  getCounties,
-  getPrograms,
-  getBudgets,
-  saveEmployeeTrackingInformation,
-} from './employee-tracking-resource';
-import styles from './employee-tracking.module.scss';
+} from '../../../commonResources/common.resource';
 
 export interface EmployeeTrackingFormProps {
   pfNumber: number | undefined;
@@ -62,37 +62,37 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
 
   useMemo(() => {
     getProjects().then((response) => {
-      let results = response.map((resp) => {
+      let results = response.data.map((resp) => {
         return resp;
       });
       setProject(results);
     });
     getDepartments().then((response) => {
-      let results = response.map((resp) => {
+      let results = response.data.map((resp) => {
         return resp;
       });
       setDepartment(results);
     });
     getSites().then((response) => {
-      let results = response.map((resp) => {
+      let results = response.data.map((resp) => {
         return resp;
       });
       setSite(results);
     });
     getCounties().then((response) => {
-      let results = response.map((resp) => {
+      let results = response.data.map((resp) => {
         return resp;
       });
       setCounty(results);
     });
     getBudgets().then((response) => {
-      let results = response.map((resp) => {
+      let results = response.data.map((resp) => {
         return resp;
       });
       setBudget(results);
     });
     getPrograms().then((response) => {
-      let results = response.map((resp) => {
+      let results = response.data.map((resp) => {
         return resp;
       });
       setProgram(results);
