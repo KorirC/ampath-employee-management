@@ -8,11 +8,15 @@ import {
   TableBody,
   TableCell,
   Button,
+  Modal,
+  Row,
+  Column,
 } from 'carbon-components-react';
 import { useMemo, useState } from 'react';
 import styles from './employee-profile.module.css';
 import { getEmployeeProfile, getTimesheet } from './EmployeeProfileConnection';
 import dayjs from 'dayjs';
+import ShoTimesheet from './timesheetImage';
 import { useParams, useHistory } from 'react-router-dom';
 const headerData = [
   {
@@ -53,6 +57,7 @@ interface ParentCallbackProps {
 
 const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
   const [timesheets, setTimesheet] = useState([]);
+  const [open, setOpen] = useState(false);
   const [employeeDetails, setEmployeeDetails] = useState<EmployeeDetails>();
   const history = useHistory();
   const { pfNumber } = useParams<{ pfNumber?: string }>();
@@ -63,8 +68,12 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
         return {
           id: `${timesheet.timesheetsId}`,
           pfNumber: timesheet.pfnumber,
-          month: dayjs(timesheet.month).format('MMMM'),
-          timesheetLink: <a href={timesheet.upload}>{timesheet.upload}</a>,
+          month: dayjs(timesheet.month).format('MMMM YYYY'),
+          timesheetLink: (
+            <a onClick={() => setOpen(true)} href={'#'}>
+              {timesheet.upload}
+            </a>
+          ),
         };
       });
       setTimesheet(results);
@@ -84,60 +93,82 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
     props.parentCallback?.({ pfNumber: pf, edit: employeeDetails });
     history.push('/AddEmployeeTracking');
   };
-
   return (
     <>
-      <div className={styles.profileStyles}>
-        <div>
-          <div className={styles.profileItems}>
-            <div className={styles.name}>
-              Name:{employeeDetails?.firstName} {employeeDetails?.middleName} {employeeDetails?.lastName}
+      <div className={styles.profileItems}>
+        <Row>
+          <Column>
+            <div className={styles.employeeProfile}>
+              NAME:
+              <a>
+                {employeeDetails?.firstName} {employeeDetails?.middleName} {employeeDetails?.lastName}
+              </a>
               <br />
-              PF number:{employeeDetails?.pfNumber}
+              PF NUMBER:<a>{employeeDetails?.pfNumber}</a>
+              <br />
+              AGE:<a>{employeeDetails?.age}</a>
+              <br />
+              GENDER:<a>{employeeDetails?.gender}</a>
+              <br />
+              EMAIL:<a>{employeeDetails?.email}</a>
+              <br />
+              TEL:<a>{employeeDetails?.telephone}</a>
+              <br />
+              PROJECT:<a>{employeeDetails?.Project}</a>
+              <br />
+              DEPARTMENT:<a>{employeeDetails?.Department}</a>
+              <br />
+              PROGRAM:<a>{employeeDetails?.ProgramArea}</a>
+              <br />
+              SITE:<a>{employeeDetails?.Site}</a>
             </div>
-            <DataTable rows={timesheets} headers={headerData}>
-              {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <TableContainer title="EMPLOYEE PROFILE">
-                  <Table {...getTableProps()}>
-                    <TableHead>
-                      <TableRow>
-                        {headers.map((header) => (
-                          <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {rows.map((row) => (
-                        <TableRow key={row.id}>
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value}</TableCell>
+          </Column>
+          <Column>
+            <div className={styles.datatable}>
+              <DataTable rows={timesheets} headers={headerData}>
+                {({ rows, headers, getHeaderProps, getTableProps }) => (
+                  <TableContainer>
+                    <Table {...getTableProps()}>
+                      <TableHead>
+                        <TableRow>
+                          {headers.map((header) => (
+                            <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                           ))}
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </DataTable>
-          </div>
-          <div className={styles.btn}>
-            <Button type="submit" className="bx--btn--secondary" onClick={handleClick}>
-              Update Details
-            </Button>
-          </div>
-          <div className={styles.bio}>
-            <div>Age:{employeeDetails?.age}</div>
-            <div>Gender:{employeeDetails?.gender}</div>
-            <div>Email address:{employeeDetails?.email}</div>
-            <div>Phone Number:{employeeDetails?.telephone}</div>
-          </div>
-          <div className={styles.contacts}>
-            <div>Project:{employeeDetails?.Project}</div>
-            <div>Department:{employeeDetails?.Department}</div>
-            <div>Program Area:{employeeDetails?.ProgramArea}</div>
-            <div>Site:{employeeDetails?.Site}</div>
-          </div>
-        </div>
+                      </TableHead>
+                      <TableBody>
+                        {rows.map((row) => (
+                          <TableRow key={row.id}>
+                            {row.cells.map((cell) => (
+                              <TableCell key={cell.id}>{cell.value}</TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+              </DataTable>
+            </div>
+            <div className={styles.btn}>
+              <Button type="submit" className="bx--btn--secondary" onClick={handleClick}>
+                Update Details
+              </Button>
+            </div>
+          </Column>
+
+          <Modal
+            modalHeading="Employee Timesheet"
+            open={open}
+            preventCloseOnClickOutside
+            passiveModal
+            onRequestClose={() => {
+              setOpen(false);
+            }}
+          >
+            <ShoTimesheet />
+          </Modal>
+        </Row>
       </div>
     </>
   );

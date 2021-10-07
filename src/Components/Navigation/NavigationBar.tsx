@@ -15,7 +15,6 @@ import {
   SideNavItems,
   SkipToContent,
 } from 'carbon-components-react';
-import { Search20, Notification20, AppSwitcher20, Add16 } from '@carbon/icons-react';
 import { Dashboard } from '../Dashboard/dashboard';
 import TimesheetUpload from '../Timesheets/timesheetUpload';
 import { Report } from '../Reports/reports';
@@ -34,9 +33,17 @@ interface CallBackValuesProps {
 
 const NavigationBar = () => {
   const [open, setOpen] = useState<boolean>(false);
+  const [sidebar, setSidebar] = useState<boolean>(true);
   const [callBackValues, setCallBackValues] = useState<CallBackValuesProps>();
   const handleCallback = (data) => {
     setCallBackValues(data);
+  };
+  const onClickSideNavClosed = () => {
+    if (sidebar == true) {
+      setSidebar(false);
+    } else {
+      setSidebar(true);
+    }
   };
   return (
     <div>
@@ -46,7 +53,7 @@ const NavigationBar = () => {
             <>
               <Header aria-label="AmpathPlus" className={styles.navbar}>
                 <SkipToContent />
-                <HeaderMenuButton aria-label="Open menu" onClick={onClickSideNavExpand} isActive={isSideNavExpanded} />
+                <HeaderMenuButton aria-label="Open menu" onClick={onClickSideNavClosed} isActive={isSideNavExpanded} />
                 <HeaderName href="#" prefix="AMPATH">
                   PLUS
                 </HeaderName>
@@ -54,32 +61,21 @@ const NavigationBar = () => {
                   <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
                   <HeaderMenuItem onClick={() => setOpen(true)}>Timesheets</HeaderMenuItem>
                   <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
-                  <HeaderMenuItem href="/LogOut">Log out</HeaderMenuItem>
                 </HeaderNavigation>
-                <HeaderGlobalBar>
-                  <HeaderGlobalAction aria-label="Add new employee">
-                    <Add16 />
-                  </HeaderGlobalAction>
-                  <HeaderGlobalAction aria-label="Search">
-                    <Search20 />
-                  </HeaderGlobalAction>
-                  <HeaderGlobalAction aria-label="Notifications">
-                    <Notification20 />
-                  </HeaderGlobalAction>
-                  <HeaderGlobalAction aria-label="App Switcher" tooltipAlignment="end">
-                    <AppSwitcher20 />
-                  </HeaderGlobalAction>
-                </HeaderGlobalBar>
-                {/* <SideNav aria-label="Side navigation" expanded={isSideNavExpanded}>
+                <SideNav
+                  className={sidebar ? styles.sideNavClosed : styles.sideNav}
+                  aria-label="sideNav"
+                  expanded={isSideNavExpanded}
+                >
                   <SideNavItems>
                     <HeaderSideNavItems hasDivider={true}>
-                      <HeaderMenuItem href="#">Home</HeaderMenuItem>
-                      <HeaderMenuItem href="#">Timesheets</HeaderMenuItem>
-                      <HeaderMenuItem href="#">Reports</HeaderMenuItem>
-                      <HeaderMenuItem href="#">Log out</HeaderMenuItem>
+                      <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
+                      <HeaderMenuItem onClick={() => setOpen(true)}>Timesheets</HeaderMenuItem>
+                      <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
+                      <HeaderMenuItem href="/LogOut">Log out</HeaderMenuItem>
                     </HeaderSideNavItems>
                   </SideNavItems>
-                </SideNav> */}
+                </SideNav>
               </Header>
             </>
           )}

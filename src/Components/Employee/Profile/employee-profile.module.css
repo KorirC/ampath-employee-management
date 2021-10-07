@@ -1,9 +1,3 @@
-.profileStyles {
-    margin: 100px;
-    border: 1px solid black;
-    margin-top: 5%;
-}
-
 .headingStyle {
     text-align: center;
     font-weight: bolder;
@@ -11,35 +5,32 @@
 }
 
 .profileItems {
+    border: 1px solid black;
+    margin: 100px;
+}
+
+.employeeProfile {
+    float: left;
+    width: 50%;
+    margin: 60px;
+    font-weight: bolder;
+}
+
+.datatable {
     padding: 50px;
 }
 
-.name {
-    margin: 15px;
-    padding: 5px;
-    font-size: larger;
+.employeeProfile a {
+    text-transform: uppercase;
+    font-weight: lighter;
 }
 
-.employeedetails {
-    color: green;
+.employeeProfile br {
+    margin: 10px;
 }
 
 .btn {
     margin: 50px;
     padding: 5px;
-    margin-top: 0%;
-}
-
-.bio {
-    margin: 50px;
-    padding: 5px;
-    font-size: larger;
-    border: 0.1px solid grey;
-}
-
-.contacts {
-    margin: 50px;
-    padding: 5px;
-    font-size: larger;
-    border: 0.1px solid grey;
+    margin-top: 0px;
 }

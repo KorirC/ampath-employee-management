@@ -1,6 +1,18 @@
 .navbar {
-    background-color:#054242 !important;
+    background-color: #054242 !important;
+    border: solid 0.5px white;
 }
-.bx--text-truncate--end{
-    color: white;
+
+.sideNav {
+    background-color: #054242 !important;
+    width: 100%;
+}
+
+.sideNavClosed {
+    width: 0px;
+}
+
+.h1 {
+    font-size: 12;
+    color: red;
 }
