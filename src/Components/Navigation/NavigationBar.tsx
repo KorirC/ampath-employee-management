@@ -18,7 +18,7 @@ import {
 import { Search20, Notification20, AppSwitcher20, Add16, Logout16 } from '@carbon/icons-react';
 import { Dashboard } from '../Dashboard/dashboard';
 import TimesheetUpload from '../Timesheets/timesheetUpload';
-import { Report } from '../Reports/reports';
+import { EmployeeStatusReport } from '../Reports/reports';
 import { EmployeeRegistrationForm } from '../Employee/Registration/employee-registration.component';
 import { Login } from '../Login/login';
 import Employeeprofile from '../Employee/Profile/employee-profile';
@@ -89,7 +89,7 @@ const NavigationBar = () => {
       <div>
         <Switch>
           <Route path="/Home" component={Dashboard} />
-          <Route path="/Reports" component={Report} />
+          <Route path="/Reports" component={EmployeeStatusReport} />
           <Route path="/EmployeeRegistration" component={EmployeeRegistrationForm} />
           {/* <Route exact path="/">
             <Login />
