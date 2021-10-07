@@ -12,7 +12,6 @@ const Login = () => {
     if (username === 'username' && password === 'password') {
       history.push('/Home');
     } else {
-      console.log('Login failed');
       setError('Wrong username or password');
     }
   };

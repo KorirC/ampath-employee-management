@@ -76,7 +76,7 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
         });
       })
       .catch((error) => {
-        console.log(error);
+        throw error;
       });
   }, [getTimesheet]);
 

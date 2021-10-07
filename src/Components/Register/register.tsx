@@ -13,13 +13,10 @@ export const Register: React.FC = () => {
 
   const onFormSubmit = (values: formInputProps, helpers: FormikHelpers<formInputProps>) => {
     helpers.setSubmitting(true);
-    console.log('Values', values);
     addUser(values).then((resp) => {
       if (resp.status === 200) {
-        console.log('response ok');
         setUserCreated(true);
       } else {
-        console.log('error');
       }
     });
   };

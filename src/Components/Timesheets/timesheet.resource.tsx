@@ -5,7 +5,6 @@ export const getAllEmployees = async () => {
       return response.json();
     })
     .then((res: any) => {
-      // console.log(res.data);
       return res.data;
     })
     .catch((error: any) => {
@@ -23,5 +22,7 @@ export const uploadTimesheet = async (formData: any) => {
     .then((res) => {
       return res;
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      throw error;
+    });
 };

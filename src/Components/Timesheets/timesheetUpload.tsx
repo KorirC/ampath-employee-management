@@ -24,9 +24,7 @@ const TimesheetUpload: React.FC = () => {
     data.append('month', month);
     data.append('upload', selectedFiles);
 
-    uploadTimesheet(data).then((res: any) => {
-      console.log(res);
-    });
+    uploadTimesheet(data).then((res: any) => {});
   };
 
   useMemo(() => {

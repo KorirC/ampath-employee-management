@@ -1,5 +1,4 @@
 const url = process.env.REACT_APP_URL;
-console.log('Url', url);
 export const getAllEmployees = async () => {
   return await fetch(url + `/employee`)
     .then((response) => {

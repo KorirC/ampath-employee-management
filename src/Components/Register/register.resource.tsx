@@ -8,7 +8,6 @@ export const addUser = async (values: formInputProps) => {
     body: JSON.stringify(values),
   })
     .then((response) => {
-      console.log(response);
       return response;
     })
     .then((res: any) => {

@@ -92,7 +92,6 @@ export const getReport = async (param: any) => {
       return response.json();
     })
     .then((res: any) => {
-      console.log(res.data.length);
       return res.data;
     })
     .catch((error: any) => {

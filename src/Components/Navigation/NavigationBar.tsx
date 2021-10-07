@@ -36,10 +36,8 @@ const NavigationBar = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [callBackValues, setCallBackValues] = useState<CallBackValuesProps>();
   const handleCallback = (data) => {
-    console.log('Handle', data);
     setCallBackValues(data);
   };
-  console.log('Callback', callBackValues);
   return (
     <div>
       <div>
