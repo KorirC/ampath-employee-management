@@ -30,6 +30,7 @@ import {
   getSites,
   trackEmployees,
 } from '../../commonResources/common.resource';
+import { exportPDF } from './exportPDF';
 
 export const EmployeeStatusReport: React.FC = () => {
   const [firstRowIndex, setFirstRowIndex] = React.useState(0);
@@ -41,7 +42,6 @@ export const EmployeeStatusReport: React.FC = () => {
   const [sites, setSites] = React.useState([]);
   const [programs, setPrograms] = React.useState([]);
   const [report, setReport] = React.useState([]);
-  const [show, setShow] = React.useState(false);
   const [selectedValues, setSelectedValues] = React.useState({
     department: '',
     project: '',
@@ -171,11 +171,7 @@ export const EmployeeStatusReport: React.FC = () => {
   };
 
   const rows = getRowItems(report);
-  React.useEffect(() => {
-    if (rows.length) {
-      setShow(true);
-    }
-  }, [rows.length]);
+
   return (
     <>
       <Grid style={{ marginTop: '7rem' }}>
@@ -303,6 +299,9 @@ export const EmployeeStatusReport: React.FC = () => {
                 </TableContainer>
               )}
             </DataTable>
+            <Button kind="secondary" onClick={() => exportPDF(report)}>
+              Download
+            </Button>
           </Column>
         </Row>
       </Grid>

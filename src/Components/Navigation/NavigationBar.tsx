@@ -28,6 +28,7 @@ import { useHistory } from 'react-router';
 import { Register } from '../Register/register';
 import { EmployeeTrackingInputProps } from '../Employee/Tracking/employee-tracking-types';
 import ProtectedRoutes from '../ProtectedRoutes/ProtectedRoutes';
+import { ShowTimesheet } from '../Employee/Profile/timesheetImage';
 
 interface CallBackValuesProps {
   pfNumber: number;
@@ -94,6 +95,9 @@ const NavigationBar = () => {
           {/* <Route exact path="/">
             <Login />
           </Route> */}
+          <Route path="/RegisterUser" component={Register}></Route>
+          <Route path="/LogOut" component={Login}></Route>
+          <Route path="/image/:filename" component={ShowTimesheet} />
           <Route
             path="/EmployeeProfile/:pfNumber"
             component={() => <Employeeprofile parentCallback={handleCallback} />}
@@ -104,14 +108,12 @@ const NavigationBar = () => {
         </Switch>
       </div>
       <Modal
-        modalHeading="Upload Timesheet"
         open={!!isAuthenticated && open}
         preventCloseOnClickOutside
         passiveModal
         onRequestClose={() => {
           setOpen(false);
         }}
-        // style={{ textAlign: 'center' }}
       >
         <TimesheetUpload />
       </Modal>
