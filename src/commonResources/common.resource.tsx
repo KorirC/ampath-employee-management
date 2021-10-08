@@ -2,12 +2,12 @@ import { useFetch } from '../globals/useFetch';
 
 const url = process.env.REACT_APP_URL;
 export const getCounties = async () => {
-  return useFetch(`${url}/county`).then((response) => {
+  return await useFetch(`${url}/county`).then((response) => {
     return response.data;
   });
 };
 export const getDepartments = async () => {
-  return useFetch(`${url}/department`).then((response) => {
+  return await useFetch(`${url}/department`).then((response) => {
     return response.data;
   });
 };

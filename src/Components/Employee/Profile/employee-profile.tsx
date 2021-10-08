@@ -12,12 +12,12 @@ import {
   Row,
   Column,
 } from 'carbon-components-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './employee-profile.module.css';
 import { getEmployeeProfile, getTimesheet } from './EmployeeProfileConnection';
 import dayjs from 'dayjs';
-import ShoTimesheet from './timesheetImage';
-import { useParams, useHistory } from 'react-router-dom';
+import { ShowTimesheet } from '../Profile/timesheetImage';
+import { useParams, useHistory, Link } from 'react-router-dom';
 const headerData = [
   {
     header: 'Month',
@@ -61,7 +61,9 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
   const [employeeDetails, setEmployeeDetails] = useState<EmployeeDetails>();
   const history = useHistory();
   const { pfNumber } = useParams<{ pfNumber?: string }>();
+
   const pf = Number(pfNumber);
+
   useMemo(() => {
     getTimesheet(pf).then((res) => {
       const results = res.map((timesheet: any) => {
@@ -70,9 +72,9 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
           pfNumber: timesheet.pfnumber,
           month: dayjs(timesheet.month).format('MMMM YYYY'),
           timesheetLink: (
-            <a onClick={() => setOpen(true)} href={'#'}>
+            <Link to={`/image/${timesheet.upload}`} onClick={() => setOpen(true)}>
               {timesheet.upload}
-            </a>
+            </Link>
           ),
         };
       });
@@ -156,18 +158,6 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
               </Button>
             </div>
           </Column>
-
-          <Modal
-            modalHeading="Employee Timesheet"
-            open={open}
-            preventCloseOnClickOutside
-            passiveModal
-            onRequestClose={() => {
-              setOpen(false);
-            }}
-          >
-            <ShoTimesheet />
-          </Modal>
         </Row>
       </div>
     </>

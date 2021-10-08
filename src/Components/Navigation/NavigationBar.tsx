@@ -18,7 +18,7 @@ import {
 import { Search20, Notification20, AppSwitcher20, Add16, Logout16 } from '@carbon/icons-react';
 import { Dashboard } from '../Dashboard/dashboard';
 import TimesheetUpload from '../Timesheets/timesheetUpload';
-import { Report } from '../Reports/reports';
+import { EmployeeStatusReport } from '../Reports/reports';
 import { EmployeeRegistrationForm } from '../Employee/Registration/employee-registration.component';
 import { Login } from '../Login/login';
 import Employeeprofile from '../Employee/Profile/employee-profile';
@@ -28,6 +28,7 @@ import { useHistory } from 'react-router';
 import { Register } from '../Register/register';
 import { EmployeeTrackingInputProps } from '../Employee/Tracking/employee-tracking-types';
 import ProtectedRoutes from '../ProtectedRoutes/ProtectedRoutes';
+import { ShowTimesheet } from '../Employee/Profile/timesheetImage';
 
 interface CallBackValuesProps {
   pfNumber: number;
@@ -89,11 +90,14 @@ const NavigationBar = () => {
       <div>
         <Switch>
           <Route path="/Home" component={Dashboard} />
-          <Route path="/Reports" component={Report} />
+          <Route path="/Reports" component={EmployeeStatusReport} />
           <Route path="/EmployeeRegistration" component={EmployeeRegistrationForm} />
           {/* <Route exact path="/">
             <Login />
           </Route> */}
+          <Route path="/RegisterUser" component={Register}></Route>
+          <Route path="/LogOut" component={Login}></Route>
+          <Route path="/image/:filename" component={ShowTimesheet} />
           <Route
             path="/EmployeeProfile/:pfNumber"
             component={() => <Employeeprofile parentCallback={handleCallback} />}
@@ -104,14 +108,12 @@ const NavigationBar = () => {
         </Switch>
       </div>
       <Modal
-        modalHeading="Upload Timesheet"
         open={!!isAuthenticated && open}
         preventCloseOnClickOutside
         passiveModal
         onRequestClose={() => {
           setOpen(false);
         }}
-        // style={{ textAlign: 'center' }}
       >
         <TimesheetUpload />
       </Modal>
