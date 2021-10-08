@@ -15,16 +15,19 @@ import {
   SideNavItems,
   SkipToContent,
 } from 'carbon-components-react';
+import { Search20, Notification20, AppSwitcher20, Add16, Logout16 } from '@carbon/icons-react';
 import { Dashboard } from '../Dashboard/dashboard';
 import TimesheetUpload from '../Timesheets/timesheetUpload';
 import { Report } from '../Reports/reports';
 import { EmployeeRegistrationForm } from '../Employee/Registration/employee-registration.component';
-import Login from '../Login/login';
+import { Login } from '../Login/login';
 import Employeeprofile from '../Employee/Profile/employee-profile';
 import { EmployeeTrackingForm } from '../Employee/Tracking/employee-tracking.component';
 import { useState } from 'react';
+import { useHistory } from 'react-router';
 import { Register } from '../Register/register';
 import { EmployeeTrackingInputProps } from '../Employee/Tracking/employee-tracking-types';
+import ProtectedRoutes from '../ProtectedRoutes/ProtectedRoutes';
 
 interface CallBackValuesProps {
   pfNumber: number;
@@ -35,6 +38,10 @@ const NavigationBar = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [sidebar, setSidebar] = useState<boolean>(true);
   const [callBackValues, setCallBackValues] = useState<CallBackValuesProps>();
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const history = useHistory();
+  const isAuthenticated = localStorage.getItem('token');
+
   const handleCallback = (data) => {
     setCallBackValues(data);
   };
@@ -62,20 +69,18 @@ const NavigationBar = () => {
                   <HeaderMenuItem onClick={() => setOpen(true)}>Timesheets</HeaderMenuItem>
                   <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
                 </HeaderNavigation>
-                <SideNav
-                  className={sidebar ? styles.sideNavClosed : styles.sideNav}
-                  aria-label="sideNav"
-                  expanded={isSideNavExpanded}
-                >
-                  <SideNavItems>
-                    <HeaderSideNavItems hasDivider={true}>
-                      <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
-                      <HeaderMenuItem onClick={() => setOpen(true)}>Timesheets</HeaderMenuItem>
-                      <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
-                      <HeaderMenuItem href="/LogOut">Log out</HeaderMenuItem>
-                    </HeaderSideNavItems>
-                  </SideNavItems>
-                </SideNav>
+                <HeaderGlobalBar>
+                  <HeaderGlobalAction
+                    id="logout"
+                    aria-label="Log Out"
+                    onClick={() => {
+                      localStorage.clear();
+                      history.push('/');
+                    }}
+                  >
+                    <Logout16 />
+                  </HeaderGlobalAction>
+                </HeaderGlobalBar>
               </Header>
             </>
           )}
@@ -83,23 +88,24 @@ const NavigationBar = () => {
       </div>
       <div>
         <Switch>
-          <Route path="/Home" component={Dashboard}></Route>
-          <Route path="/RegisterUser" component={Register}></Route>
-          <Route path="/Reports" component={Report}></Route>
-          <Route path="/EmployeeRegistration" component={EmployeeRegistrationForm}></Route>
-          <Route path="/LogOut" component={Login}></Route>
+          <Route path="/Home" component={Dashboard} />
+          <Route path="/Reports" component={Report} />
+          <Route path="/EmployeeRegistration" component={EmployeeRegistrationForm} />
+          {/* <Route exact path="/">
+            <Login />
+          </Route> */}
           <Route
             path="/EmployeeProfile/:pfNumber"
             component={() => <Employeeprofile parentCallback={handleCallback} />}
-          ></Route>
-          <Route path="/AddEmployeeTracking">
+          />
+          <Route path="/AddEmployeeTracking" component={EmployeeTrackingForm}>
             <EmployeeTrackingForm pfNumber={callBackValues?.pfNumber} edit={callBackValues?.edit} />
           </Route>
         </Switch>
       </div>
       <Modal
         modalHeading="Upload Timesheet"
-        open={open}
+        open={!!isAuthenticated && open}
         preventCloseOnClickOutside
         passiveModal
         onRequestClose={() => {

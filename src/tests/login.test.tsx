@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import Login from '../Components/Login/login';
+import { Login } from '../Components/Login/login';
 
 describe('Login render Page', () => {
   it('renders the input fields and login button', () => {

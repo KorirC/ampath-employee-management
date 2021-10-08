@@ -22,7 +22,7 @@ export const Register: React.FC = () => {
   };
 
   const history = useHistory();
-  const handleOnClick = useCallback(() => history.push('/Logout'), [history]);
+  const handleOnClick = useCallback(() => history.push('/'), [history]);
 
   return (
     <>

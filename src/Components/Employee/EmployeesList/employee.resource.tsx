@@ -1,10 +1,22 @@
 const url = process.env.REACT_APP_URL;
+console.log('Url', url);
+const token = localStorage.getItem('token');
+
 export const getAllEmployees = async () => {
-  return await fetch(url + `/employee`)
+  const options = {
+    headers: {
+      Authorization: `Bearer  ${token}`,
+      'Content-Type': 'application/json',
+    },
+  };
+
+  return await fetch(url + `/employee`, options)
     .then((response) => {
       return response.json();
     })
     .then((res: any) => {
+      console.log(res);
+
       return res.data;
     })
     .catch((error: any) => {
