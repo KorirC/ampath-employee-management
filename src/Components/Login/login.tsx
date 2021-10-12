@@ -8,19 +8,22 @@ import { formValues, formInputProps } from './login.types';
 import { validationSchema } from './login.validation';
 import styles from './login.module.scss';
 
-export const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+interface props {
+  setIsAuthenticated: any;
+}
+
+export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
   const [error, setError] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const history = useHistory();
 
   const onFormSubmit = (values: formInputProps, helpers: FormikHelpers<formInputProps>) => {
     helpers.setSubmitting(true);
-    //console.log('Values', values);
+
     loginUser(values).then((resp) => {
       if (resp.data.token) {
-        history.push('/Home');
+        setIsAuthenticated(true);
         localStorage.setItem('token', resp.data.token);
+        history.push('/Home');
       } else {
         console.log('error');
         setError('Wrong username or password');
@@ -28,8 +31,9 @@ export const Login: React.FC = () => {
     });
   };
 
-  const history = useHistory();
-  const handleRegister = () => history.push('/RegisterUser');
+  const handleRegister = () => {
+    history.push('/RegisterUser');
+  };
 
   return (
     <>
