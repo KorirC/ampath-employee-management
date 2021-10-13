@@ -273,9 +273,11 @@ export const EmployeeStatusReport: React.FC = () => {
                         ))
                       ) : (
                         <TableRow>
-                          <TableCell style={{ columnSpan: 'all' }}>
-                            <h5>No records found</h5>
-                          </TableCell>
+                          {headers.map((header: any) => (
+                            <TableHeader key={header.key} {...getHeaderProps({ header })}>
+                              {header.header}
+                            </TableHeader>
+                          ))}
                         </TableRow>
                       )}
                     </TableBody>
