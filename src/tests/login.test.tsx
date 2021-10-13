@@ -4,7 +4,7 @@ import { Login } from '../Components/Login/login';
 
 describe('Login render Page', () => {
   it('renders the input fields and login button', () => {
-    const { getByTestId } = render(<Login />);
+    const { getByTestId } = render(<Login setIsAuthenticated={undefined} />);
     expect(getByTestId('username')).toBeInTheDocument();
     expect(getByTestId('password')).toBeInTheDocument();
     expect(getByTestId('login')).toBeInTheDocument();
