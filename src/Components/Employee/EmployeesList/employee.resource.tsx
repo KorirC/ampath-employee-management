@@ -1,7 +1,5 @@
 const url = process.env.REACT_APP_URL;
-console.log('Url', url);
 const token = localStorage.getItem('token');
-
 export const getAllEmployees = async () => {
   const options = {
     headers: {
