@@ -58,10 +58,10 @@ function App() {
   });
 
   return (
-    <Router>
+    <>
       {!isAuthenticated ? (
         <>
-          <Route path="/">
+          <Route exact path="/">
             <Login setIsAuthenticated={setIsAuthenticated} />
           </Route>
           <Route path="/RegisterUser" component={Register}></Route>
@@ -140,7 +140,7 @@ function App() {
           </Modal>
         </>
       )}
-    </Router>
+    </>
   );
 }
 
