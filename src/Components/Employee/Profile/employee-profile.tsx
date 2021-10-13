@@ -97,36 +97,16 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
   };
   return (
     <>
-      <div className={styles.profileItems}>
+      <div className={styles.card}>
         <Row>
           <Column>
-            <div className={styles.employeeProfile}>
-              NAME:
-              <a>
-                {employeeDetails?.firstName} {employeeDetails?.middleName} {employeeDetails?.lastName}
-              </a>
-              <br />
-              PF NUMBER:<a>{employeeDetails?.pfNumber}</a>
-              <br />
-              AGE:<a>{employeeDetails?.age}</a>
-              <br />
-              GENDER:<a>{employeeDetails?.gender}</a>
-              <br />
-              EMAIL:<a>{employeeDetails?.email}</a>
-              <br />
-              TEL:<a>{employeeDetails?.telephone}</a>
-              <br />
-              PROJECT:<a>{employeeDetails?.Project}</a>
-              <br />
-              DEPARTMENT:<a>{employeeDetails?.Department}</a>
-              <br />
-              PROGRAM:<a>{employeeDetails?.ProgramArea}</a>
-              <br />
-              SITE:<a>{employeeDetails?.Site}</a>
-            </div>
-          </Column>
-          <Column>
-            <div className={styles.datatable}>
+            <h3>
+              {employeeDetails?.firstName} {employeeDetails?.middleName} {employeeDetails?.lastName}
+            </h3>
+            <p className="title">{employeeDetails?.email}</p>
+            <p>{employeeDetails?.telephone}</p>
+            <p>PF Number: {employeeDetails?.pfNumber}</p>
+            <div>
               <DataTable rows={timesheets} headers={headerData}>
                 {({ rows, headers, getHeaderProps, getTableProps }) => (
                   <TableContainer>
@@ -152,11 +132,15 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
                 )}
               </DataTable>
             </div>
-            <div className={styles.btn}>
-              <Button type="submit" className="bx--btn--secondary" onClick={handleClick}>
+            <div className={styles.workDetails}>
+              <p>Project: {employeeDetails?.Project}</p> <p>Department: {employeeDetails?.Department}</p>{' '}
+              <p>Program: {employeeDetails?.ProgramArea}</p> <p>Site: {employeeDetails?.Site}</p>
+            </div>
+            <p>
+              <Button type="submit" className={styles.button} onClick={handleClick}>
                 Update Details
               </Button>
-            </div>
+            </p>
           </Column>
         </Row>
       </div>
