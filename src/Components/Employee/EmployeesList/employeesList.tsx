@@ -20,21 +20,19 @@ import {
 } from 'carbon-components-react';
 import { Employee, getAllEmployees } from './employee.resource';
 import dayjs from 'dayjs';
+import { exportPDF } from './exportPDF';
 
 const EmployeeList: React.FC = () => {
   const history = useHistory();
   const [firstRowIndex, setFirstRowIndex] = React.useState(0);
-  const [currentPageSize, setCurrentPageSize] = React.useState(10);
+  const [currentPageSize, setCurrentPageSize] = React.useState(5);
   const [employees, setEmployees] = React.useState<Array<Employee>>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
-      { key: 'id', header: 'ID' },
       { key: 'pfNumber', header: 'PF Number' },
       { key: 'name', header: 'Name' },
-      { key: 'dob', header: 'D.O.B' },
-      { key: 'gender', header: 'Gender' },
       { key: 'telephone', header: 'Phone Number' },
       { key: 'email', header: 'Email' },
       { key: 'kraPin', header: 'KRA Pin' },
@@ -50,7 +48,7 @@ const EmployeeList: React.FC = () => {
         return {
           ...employee,
           id: employee.id,
-          name: `${employee.firstName} ${employee.lastName}`,
+          name: `${employee.firstName} ${employee.middleName} ${employee.lastName}`,
           idNumber: employee.idNumber,
           dob: dayjs(employee.dob).format('YYYY-MM-DD'),
           age: employee.age,
@@ -101,63 +99,79 @@ const EmployeeList: React.FC = () => {
   return (
     <>
       {employees.length > 0 ? (
-        <DataTable rows={rows} headers={tableHeaders} useZebraStyles>
-          {({
-            rows,
-            headers,
-            getHeaderProps,
-            getTableProps,
-          }: {
-            rows: any;
-            headers: any;
-            getHeaderProps: any;
-            getTableProps: any;
-          }) => (
-            <TableContainer title="Employees List" style={{ marginTop: '10rem' }}>
-              <TableToolbar>
-                <TableToolbarContent>
-                  <TableToolbarSearch persistent={true} onChange={handleSearch} />
-                  <Button kind="secondary" onClick={registerEmployee}>
-                    Create New Employee
-                  </Button>
-                </TableToolbarContent>
-              </TableToolbar>
-              <Table {...getTableProps()}>
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header: any) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row: any) => (
-                    <TableRow key={row.id} onClick={() => handleRowClick(row.cells[1].value)}>
-                      {row.cells.map((cell: any) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
+        <>
+          <DataTable rows={rows} headers={tableHeaders} useZebraStyles>
+            {({
+              rows,
+              headers,
+              getHeaderProps,
+              getTableProps,
+            }: {
+              rows: any;
+              headers: any;
+              getHeaderProps: any;
+              getTableProps: any;
+            }) => (
+              <TableContainer title="Employees List" style={{ marginTop: '10rem' }}>
+                <TableToolbar>
+                  <TableToolbarContent>
+                    <TableToolbarSearch persistent={true} onChange={handleSearch} />
+                    <Button kind="secondary" onClick={registerEmployee}>
+                      Create New Employee
+                    </Button>
+                  </TableToolbarContent>
+                </TableToolbar>
+                <Table {...getTableProps()}>
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header: any) => (
+                        <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                       ))}
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <Pagination
-                totalItems={filteredEmployees.length}
-                backwardText="Previous page"
-                forwardText="Next page"
-                itemsPerPageText="Items per page:"
-                pageNumberText="Page Number"
-                pageSize={currentPageSize}
-                pageSizes={[5, 10, 15, 20, 25]}
-                onChange={({ page, pageSize }) => {
-                  if (pageSize !== currentPageSize) {
-                    setCurrentPageSize(pageSize);
-                  }
-                  setFirstRowIndex(pageSize * (page - 1));
-                }}
-              />
-            </TableContainer>
-          )}
-        </DataTable>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row: any) => (
+                      <TableRow
+                        key={row.id}
+                        onClick={() => handleRowClick(row.cells[0].value)}
+                        title="Click to view profile"
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {row.cells.map((cell: any) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <Pagination
+                  totalItems={filteredEmployees.length}
+                  backwardText="Previous page"
+                  forwardText="Next page"
+                  itemsPerPageText="Items per page:"
+                  pageNumberText="Page Number"
+                  pageSize={currentPageSize}
+                  pageSizes={[5, 10, 15, 20, 25]}
+                  onChange={({ page, pageSize }) => {
+                    if (pageSize !== currentPageSize) {
+                      setCurrentPageSize(pageSize);
+                    }
+                    setFirstRowIndex(pageSize * (page - 1));
+                  }}
+                />
+              </TableContainer>
+            )}
+          </DataTable>
+          <br />
+          <Button
+            kind="secondary"
+            onClick={() => {
+              exportPDF(employees);
+            }}
+          >
+            Download
+          </Button>
+        </>
       ) : (
         <DataTableSkeleton role="progressbar" />
       )}

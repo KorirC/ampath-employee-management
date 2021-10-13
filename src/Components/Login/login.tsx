@@ -1,85 +1,112 @@
 import React, { useCallback, useState } from 'react';
+import { Formik, Form, FormikHelpers } from 'formik';
 import { useHistory } from 'react-router-dom';
-import { TextInput, Button, Form, Checkbox, PasswordInput, InlineNotification } from 'carbon-components-react';
+import { TextInput, Button, Checkbox, PasswordInput, InlineNotification, Link } from 'carbon-components-react';
+import { loginUser } from './login.resource';
+import { Register } from '../Register/register';
+import { formValues, formInputProps } from './login.types';
+import { validationSchema } from './login.validation';
 import styles from './login.module.scss';
 
-const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+interface props {
+  setIsAuthenticated: any;
+}
 
-  const handleLogin = () => {
-    if (username === 'username' && password === 'password') {
-      history.push('/Home');
-    } else {
-      console.log('Login failed');
-      setError('Wrong username or password');
-    }
+export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
+  const [error, setError] = useState('');
+  const history = useHistory();
+
+  const onFormSubmit = (values: formInputProps, helpers: FormikHelpers<formInputProps>) => {
+    helpers.setSubmitting(true);
+
+    loginUser(values).then((resp) => {
+      if (resp.data.token) {
+        setIsAuthenticated(true);
+        localStorage.setItem('token', resp.data.token);
+        history.push('/Home');
+      } else {
+        console.log('error');
+        setError('Wrong username or password');
+      }
+    });
   };
 
-  const history = useHistory();
-  const handleRegister = useCallback(() => history.push('/RegisterUser'), [history]);
+  const handleRegister = () => {
+    history.push('/RegisterUser');
+  };
 
   return (
-    <Form className={styles.loginform}>
-      <div className="bx--grid">
-        <div className="bx--row">
-          <div>
-            <h1 className={styles.h1}>Welcome to HR System </h1>
-            <TextInput
-              id="username"
-              data-testid="username"
-              invalidText="A valid username is required"
-              labelText="User Name:"
-              required
-              placeholder="Enter User Name"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <PasswordInput
-              id="password"
-              hidePasswordLabel="Hide password"
-              invalidText="A valid password is required"
-              labelText="Password: "
-              required
-              placeholder="Enter Password"
-              showPasswordLabel="Show password"
-              data-testid="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <div>
-              <Checkbox defaultChecked labelText="Remember me" id="checked" className={styles.checked} />
-              {error && (
+    <>
+      <Formik validationSchema={validationSchema} initialValues={formValues} onSubmit={onFormSubmit}>
+        {({ handleChange, setFieldValue, handleBlur, values, touched, errors }) => (
+          <Form className={styles.loginform}>
+            <div className="bx--grid">
+              <div className="bx--row">
                 <div>
-                  <InlineNotification iconDescription="Error" kind="error" title="Login Error:Try Again" />
+                  <h1 className={styles.h1}>Welcome to HR System </h1>
+                  <TextInput
+                    id="userName"
+                    name="userName"
+                    data-testid="username"
+                    invalid={!!(touched.userName && errors.userName)}
+                    invalidText={errors.userName}
+                    labelText="User Name:"
+                    required
+                    placeholder="Enter User Name"
+                    type="text"
+                    value={values.userName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  <PasswordInput
+                    id="password"
+                    hidePasswordLabel="Hide password"
+                    labelText="Password: "
+                    required
+                    placeholder="Enter Password"
+                    showPasswordLabel="Show password"
+                    data-testid="password"
+                    invalid={!!(touched.password && errors.password)}
+                    invalidText={errors.password}
+                    value={values.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  <div>
+                    <Checkbox labelText="Remember me" id="checked" className={styles.checked} />
+                    {error && (
+                      <div>
+                        <InlineNotification iconDescription="Error" kind="error" title="Login Error:Try Again" />
+                      </div>
+                    )}
+                    <Button
+                      size="field"
+                      kind="primary"
+                      type="submit"
+                      data-testid="login"
+                      className={styles.logoutbutton}
+                    >
+                      Login
+                    </Button>
+                    <Button
+                      size="field"
+                      kind="secondary"
+                      type="submit"
+                      className={styles.registerbutton}
+                      onClick={handleRegister}
+                    >
+                      Register
+                    </Button>
+                  </div>
+                  {/* <Link className={styles.link} href="http://www.carbondesignsystem.com">
+                    Forgot Password?
+                  </Link> */}
                 </div>
-              )}
-              <Button
-                size="field"
-                kind="primary"
-                type="submit"
-                data-testid="login"
-                className={styles.logoutbutton}
-                onClick={handleLogin}
-              >
-                Login
-              </Button>
-              <Button
-                size="field"
-                kind="secondary"
-                type="submit"
-                className={styles.registerbutton}
-                onClick={handleRegister}
-              >
-                Register
-              </Button>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </Form>
+          </Form>
+        )}
+      </Formik>
+    </>
   );
 };
-
-export default Login;

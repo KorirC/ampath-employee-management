@@ -15,17 +15,20 @@ import {
   SideNavItems,
   SkipToContent,
 } from 'carbon-components-react';
-import { Search20, Notification20, AppSwitcher20, Add16 } from '@carbon/icons-react';
+import { Search20, Notification20, AppSwitcher20, Add16, Logout16 } from '@carbon/icons-react';
 import { Dashboard } from '../Dashboard/dashboard';
 import TimesheetUpload from '../Timesheets/timesheetUpload';
-import { Report } from '../Reports/reports';
+import { EmployeeStatusReport } from '../Reports/reports';
 import { EmployeeRegistrationForm } from '../Employee/Registration/employee-registration.component';
-import Login from '../Login/login';
+import { Login } from '../Login/login';
 import Employeeprofile from '../Employee/Profile/employee-profile';
 import { EmployeeTrackingForm } from '../Employee/Tracking/employee-tracking.component';
 import { useState } from 'react';
+import { useHistory } from 'react-router';
 import { Register } from '../Register/register';
 import { EmployeeTrackingInputProps } from '../Employee/Tracking/employee-tracking-types';
+import ProtectedRoutes from '../ProtectedRoutes/ProtectedRoutes';
+import { ShowTimesheet } from '../Employee/Profile/timesheetImage';
 
 interface CallBackValuesProps {
   pfNumber: number;
@@ -34,12 +37,22 @@ interface CallBackValuesProps {
 
 const NavigationBar = () => {
   const [open, setOpen] = useState<boolean>(false);
+  const [sidebar, setSidebar] = useState<boolean>(true);
   const [callBackValues, setCallBackValues] = useState<CallBackValuesProps>();
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const history = useHistory();
+  const isAuthenticated = localStorage.getItem('token');
+
   const handleCallback = (data) => {
-    console.log('Handle', data);
     setCallBackValues(data);
   };
-  console.log('Callback', callBackValues);
+  const onClickSideNavClosed = () => {
+    if (sidebar == true) {
+      setSidebar(false);
+    } else {
+      setSidebar(true);
+    }
+  };
   return (
     <div>
       <div>
@@ -48,7 +61,7 @@ const NavigationBar = () => {
             <>
               <Header aria-label="AmpathPlus" className={styles.navbar}>
                 <SkipToContent />
-                <HeaderMenuButton aria-label="Open menu" onClick={onClickSideNavExpand} isActive={isSideNavExpanded} />
+                <HeaderMenuButton aria-label="Open menu" onClick={onClickSideNavClosed} isActive={isSideNavExpanded} />
                 <HeaderName href="#" prefix="AMPATH">
                   PLUS
                 </HeaderName>
@@ -56,32 +69,19 @@ const NavigationBar = () => {
                   <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
                   <HeaderMenuItem onClick={() => setOpen(true)}>Timesheets</HeaderMenuItem>
                   <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
-                  <HeaderMenuItem href="/LogOut">Log out</HeaderMenuItem>
                 </HeaderNavigation>
                 <HeaderGlobalBar>
-                  <HeaderGlobalAction aria-label="Add new employee">
-                    <Add16 />
-                  </HeaderGlobalAction>
-                  <HeaderGlobalAction aria-label="Search">
-                    <Search20 />
-                  </HeaderGlobalAction>
-                  <HeaderGlobalAction aria-label="Notifications">
-                    <Notification20 />
-                  </HeaderGlobalAction>
-                  <HeaderGlobalAction aria-label="App Switcher" tooltipAlignment="end">
-                    <AppSwitcher20 />
+                  <HeaderGlobalAction
+                    id="logout"
+                    aria-label="Log Out"
+                    onClick={() => {
+                      localStorage.clear();
+                      history.push('/');
+                    }}
+                  >
+                    <Logout16 />
                   </HeaderGlobalAction>
                 </HeaderGlobalBar>
-                {/* <SideNav aria-label="Side navigation" expanded={isSideNavExpanded}>
-                  <SideNavItems>
-                    <HeaderSideNavItems hasDivider={true}>
-                      <HeaderMenuItem href="#">Home</HeaderMenuItem>
-                      <HeaderMenuItem href="#">Timesheets</HeaderMenuItem>
-                      <HeaderMenuItem href="#">Reports</HeaderMenuItem>
-                      <HeaderMenuItem href="#">Log out</HeaderMenuItem>
-                    </HeaderSideNavItems>
-                  </SideNavItems>
-                </SideNav> */}
               </Header>
             </>
           )}
@@ -89,29 +89,31 @@ const NavigationBar = () => {
       </div>
       <div>
         <Switch>
-          <Route path="/Home" component={Dashboard}></Route>
+          <Route path="/Home" component={Dashboard} />
+          <Route path="/Reports" component={EmployeeStatusReport} />
+          <Route path="/EmployeeRegistration" component={EmployeeRegistrationForm} />
+          {/* <Route exact path="/">
+            <Login />
+          </Route> */}
           <Route path="/RegisterUser" component={Register}></Route>
-          <Route path="/Reports" component={Report}></Route>
-          <Route path="/EmployeeRegistration" component={EmployeeRegistrationForm}></Route>
           <Route path="/LogOut" component={Login}></Route>
+          <Route path="/image/:filename" component={ShowTimesheet} />
           <Route
             path="/EmployeeProfile/:pfNumber"
             component={() => <Employeeprofile parentCallback={handleCallback} />}
-          ></Route>
-          <Route path="/AddEmployeeTracking">
+          />
+          <Route path="/AddEmployeeTracking" component={EmployeeTrackingForm}>
             <EmployeeTrackingForm pfNumber={callBackValues?.pfNumber} edit={callBackValues?.edit} />
           </Route>
         </Switch>
       </div>
       <Modal
-        modalHeading="Upload Timesheet"
-        open={open}
+        open={!!isAuthenticated && open}
         preventCloseOnClickOutside
         passiveModal
         onRequestClose={() => {
           setOpen(false);
         }}
-        // style={{ textAlign: 'center' }}
       >
         <TimesheetUpload />
       </Modal>

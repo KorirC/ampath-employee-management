@@ -1,6 +1,11 @@
 const BaseUrl = process.env.REACT_APP_URL;
+const token = localStorage.getItem('token');
 export const getEmployeeProfile = async (pf) => {
-  return await fetch(BaseUrl + `/search?pfnumber=${pf}`)
+  return await fetch(BaseUrl + `/search?pfnumber=${pf}`, {
+    headers: {
+      Authorization: `Bearer  ${token}`,
+    },
+  })
     .then((response) => {
       return response.json();
     })
@@ -13,12 +18,33 @@ export const getEmployeeProfile = async (pf) => {
 };
 
 export const getTimesheet = async (pf) => {
-  return await fetch(BaseUrl + `/timesheet?pfnumber=${pf}`)
+  return await fetch(BaseUrl + `/timesheet?pfnumber=${pf}`, {
+    headers: {
+      Authorization: `Bearer  ${token}`,
+    },
+  })
     .then((response) => {
       return response.json();
     })
     .then((res: any) => {
       return res.data;
+    })
+    .catch((error: any) => {
+      return error;
+    });
+};
+
+export const getSingleTimesheet = async (filename) => {
+  return await fetch(BaseUrl + `/image?filename=${filename}`, {
+    headers: {
+      Authorization: `Bearer  ${token}`,
+    },
+  })
+    .then((response) => {
+      return response;
+    })
+    .then((res: any) => {
+      return res;
     })
     .catch((error: any) => {
       return error;

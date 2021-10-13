@@ -3,8 +3,10 @@ import { Form, TextInput, FileUploader, Button, Grid, Column, Row } from 'carbon
 import { getAllEmployees, uploadTimesheet } from '../Timesheets/timesheet.resource';
 import FilterableMultiSelect from 'carbon-components-react/lib/components/MultiSelect/FilterableMultiSelect';
 import styles from './timesheet.module.scss';
+import { useHistory } from 'react-router-dom';
 
 const TimesheetUpload: React.FC = () => {
+  const history = useHistory();
   const [selectedFiles, setSelectedFiles] = useState<any>();
   const [employees, setEmployees] = useState<Array<any>>([]);
   const [selectEmployees, setSelectEmployees] = useState([]);
@@ -25,7 +27,8 @@ const TimesheetUpload: React.FC = () => {
     data.append('upload', selectedFiles);
 
     uploadTimesheet(data).then((res: any) => {
-      console.log(res);
+      // console.log(res);
+      history.push(`/Home`);
     });
   };
 
@@ -48,6 +51,8 @@ const TimesheetUpload: React.FC = () => {
         <Row>
           <Column>
             <Form onSubmit={upload} encType="multipart/form-data" className={styles.form}>
+              <h5>Upload Timesheet</h5>
+              <br />
               <FilterableMultiSelect
                 id=""
                 items={employees}

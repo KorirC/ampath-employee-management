@@ -73,6 +73,8 @@ export const EmployeeRegistrationForm: React.FC = () => {
       <SideNav isFixedNav expanded={true} aria-label="SideNav">
         <SideNavItems>
           <SideNavDivider />
+          <br />
+          <h3>Create Employee</h3>
           <SideNavLink onClick={handleBasicRef}>Basic info</SideNavLink>
           <SideNavDivider />
           <SideNavLink onClick={handleContactRef}>Contact details</SideNavLink>
