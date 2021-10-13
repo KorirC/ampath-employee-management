@@ -7,6 +7,8 @@ import { Register } from '../Register/register';
 import { formValues, formInputProps } from './login.types';
 import { validationSchema } from './login.validation';
 import styles from './login.module.scss';
+import { ArrowUpRight16 } from '@carbon/icons-react';
+import ampath from '../../images/ampath.png';
 
 interface props {
   setIsAuthenticated: any;
@@ -43,7 +45,7 @@ export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
             <div className="bx--grid">
               <div className="bx--row">
                 <div>
-                  <h1 className={styles.h1}>Welcome to HR System </h1>
+                  <img src={ampath} className={styles.ampath} />
                   <TextInput
                     id="userName"
                     name="userName"
@@ -73,7 +75,7 @@ export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
                     onBlur={handleBlur}
                   />
                   <div>
-                    <Checkbox labelText="Remember me" id="checked" className={styles.checked} />
+                    {/* <Checkbox labelText="Remember me" id="checked" className={styles.checked} /> */}
                     {error && (
                       <div>
                         <InlineNotification iconDescription="Error" kind="error" title="Login Error:Try Again" />
@@ -98,7 +100,7 @@ export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
                       Register
                     </Button>
                   </div>
-                  {/* <Link className={styles.link} href="http://www.carbondesignsystem.com">
+                  {/* <Link className={styles.link} href="#" renderIcon={ArrowUpRight16}>
                     Forgot Password?
                   </Link> */}
                 </div>
