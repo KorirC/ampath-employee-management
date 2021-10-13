@@ -19,6 +19,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableToolbar,
+  TableToolbarContent,
 } from 'carbon-components-react';
 import {
   getBudgets,
@@ -31,6 +33,7 @@ import {
   trackEmployees,
 } from '../../commonResources/common.resource';
 import { exportPDF } from './exportPDF';
+import { Download16 as Download } from '@carbon/icons-react';
 
 export const EmployeeStatusReport: React.FC = () => {
   const [firstRowIndex, setFirstRowIndex] = React.useState(0);
@@ -179,54 +182,49 @@ export const EmployeeStatusReport: React.FC = () => {
             <FormLabel>
               <span>Filter By</span>
             </FormLabel>
-            <Select
-              id="contractStatus"
-              labelText="Contract Status: "
-              defaultValue="placeholder-item"
-              onChange={handleChange}
-            >
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="contractStatus" labelText="Contract Status: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               <SelectItem text="Active" value="Active" />
               <SelectItem text="InActive" value="InActive" />
             </Select>
 
-            <Select id="department" labelText="Department: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="department" labelText="Department: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {departments.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
-            <Select id="project" labelText="Project: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="project" labelText="Project: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {projects.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
-            <Select id="site" labelText="Site: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="site" labelText="Site: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {sites.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
-            <Select id="budget" labelText="Budget: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="budget" labelText="Budget: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {budgets.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
-            <Select id="county" labelText="County: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="county" labelText="County: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {counties.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
-            <Select id="programArea" labelText="Program Area: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="programArea" labelText="Program Area: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {programs.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
@@ -242,16 +240,21 @@ export const EmployeeStatusReport: React.FC = () => {
                 rows,
                 headers,
                 getHeaderProps,
-                getRowProps,
                 getTableProps,
               }: {
                 rows: any;
                 headers: any;
-                getRowProps: any;
                 getHeaderProps: any;
                 getTableProps: any;
               }) => (
                 <TableContainer title="Employees Report" style={{ marginTop: '3rem' }}>
+                  <TableToolbar>
+                    <TableToolbarContent>
+                      <Button kind="secondary" onClick={() => exportPDF(report)} renderIcon={Download}>
+                        Download
+                      </Button>
+                    </TableToolbarContent>
+                  </TableToolbar>
                   <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
@@ -273,7 +276,7 @@ export const EmployeeStatusReport: React.FC = () => {
                         ))
                       ) : (
                         <TableRow>
-                          <TableCell style={{ columnSpan: 'all' }}>
+                          <TableCell colSpan={8} style={{ textAlign: 'center' }}>
                             <h5>No records found</h5>
                           </TableCell>
                         </TableRow>
@@ -298,9 +301,6 @@ export const EmployeeStatusReport: React.FC = () => {
                 </TableContainer>
               )}
             </DataTable>
-            <Button kind="secondary" onClick={() => exportPDF(report)}>
-              Download
-            </Button>
           </Column>
         </Row>
       </Grid>
