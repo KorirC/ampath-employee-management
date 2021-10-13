@@ -145,6 +145,7 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
       )}
 
       <Form className={styles.form} onSubmit={handleSubmit(handleFormSubmit)}>
+        <h4 className={styles.header}>Update Details</h4>
         <Column>
           <Select
             id="project"
