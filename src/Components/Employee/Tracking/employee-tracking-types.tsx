@@ -10,10 +10,10 @@ export interface EmployeeTrackingInputProps {
   dateOfJoining: string;
   dateOfLeaving: string;
   jobSpecification: string;
-  projectId?: number;
-  departmentId?: number;
-  siteId?: number;
-  countyId?: number;
-  budgetId?: number;
-  programId?: number;
+  projectId: number;
+  departmentId: number;
+  siteId: number;
+  countyId: number;
+  budgetId: number;
+  programId: number;
 }
