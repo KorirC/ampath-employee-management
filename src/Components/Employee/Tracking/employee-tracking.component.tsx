@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import dayjs from 'dayjs';
@@ -25,6 +25,7 @@ import {
   getProjects,
   getSites,
 } from '../../../commonResources/common.resource';
+import { useHistory } from 'react-router';
 
 export interface EmployeeTrackingFormProps {
   pfNumber: number | undefined;
@@ -33,49 +34,87 @@ export interface EmployeeTrackingFormProps {
 }
 
 export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props) => {
-  const [project, setProject] = useState<Array<any>>([]);
-  const [department, setDepartment] = useState<Array<any>>();
-  const [site, setSite] = useState<Array<any>>();
-  const [county, setCounty] = useState<Array<any>>();
-  const [budget, setBudget] = useState<Array<any>>();
-  const [program, setProgram] = useState<Array<any>>();
+  const [projectId, setProject] = useState<Array<any>>([]);
+  const [departmentId, setDepartment] = useState<Array<any>>();
+  const [siteId, setSite] = useState<Array<any>>();
+  const [countyId, setCounty] = useState<Array<any>>();
+  const [budgetId, setBudget] = useState<Array<any>>();
+  const [programId, setProgram] = useState<Array<any>>();
   const [formSuccess, setFormSuccess] = useState<boolean>(false);
   const [formError, setFormError] = useState<boolean>(false);
+  const [edited, setEdited] = useState<boolean>(false);
+  const history = useHistory();
   const {
     register,
     setValue,
+    getValues,
     watch,
     handleSubmit,
     formState: { errors, touchedFields },
-  } = useForm({ resolver: yupResolver(validationSchema), mode: 'onChange' });
+  } = useForm({ resolver: yupResolver(validationSchema), mode: 'all' });
   const editValues = props.edit;
+  const inputNames = [
+    'projectId',
+    'departmentId',
+    'siteId',
+    'countyId',
+    'budgetId',
+    'programId',
+    'endOfContract',
+    'dateOfJoining',
+    'dateOfLeaving',
+    'jobSpecification',
+  ];
 
-  useMemo(
-    () =>
-      editValues &&
-      (setValue('project', editValues?.projectId),
-      setValue('department', editValues?.departmentId),
-      setValue('site', editValues?.siteId),
-      setValue('county', editValues?.countyId),
-      setValue('countyBudget', editValues?.budgetId),
-      setValue('programArea', editValues?.programId),
-      setValue('endOfContract', new Date(editValues?.endOfContract)),
-      setValue('dateOfJoining', new Date(editValues?.dateOfJoining)),
-      setValue('dateOfLeaving', new Date(editValues?.dateOfLeaving)),
-      setValue('jobSpecification', editValues?.jobSpecification)),
-    [editValues],
-  );
+  useMemo(() => {
+    editValues && setEdited(true);
+    inputNames.map((name) => {
+      Object.entries({ ...editValues })
+        .filter(([key]) => key == name)
+        .map((values) => {
+          const initialValues =
+            values[0] === 'endOfContract' || values[0] === 'dateOfJoining' || values[0] === 'dateOfLeaving'
+              ? new Date(values[1])
+              : values[1];
+          setValue(values[0], initialValues);
+        });
+    });
+  }, [editValues]);
+
+  useEffect(() => {
+    Object.keys(touchedFields).map((names) => {
+      Object.entries({ ...editValues })
+        .filter(([key]) => key == names)
+        .map((values) => {
+          const insertedValue =
+            typeof watch(names) == 'object' ? dayjs(watch(names)).format('YYYY-MM-DD') : watch(names);
+          if (insertedValue != values[1]) {
+            setEdited(false);
+          } else {
+            setEdited(true);
+          }
+        });
+    });
+  }, [{ ...touchedFields }, editValues]);
 
   const handleFormSubmit = (values: EmployeeTrackingInputProps) => {
     values.pfNumber = props.pfNumber;
+    values.project = values.projectId;
+    values.department = values.departmentId;
+    values.site = values.siteId;
+    values.county = values.countyId;
+    values.countyBudget = values.budgetId;
+    values.programArea = values.programId;
     values.endOfContract = dayjs(values.endOfContract).format('YYYY-MM-DD');
     values.dateOfJoining = dayjs(values.dateOfJoining).format('YYYY-MM-DD');
     values.dateOfLeaving = dayjs(values.dateOfLeaving).format('YYYY-MM-DD');
+    console.log('Values', values);
     saveEmployeeTrackingInformation(values)
       .then((response) => {
         if (response.status === 200) {
           setFormSuccess(true);
           props.parentCallback?.({ formSuccess: true });
+          setTimeout(() => history.push(`/EmployeeProfile/${props.pfNumber}`), 2000);
         }
       })
       .catch((error) => {
@@ -150,13 +189,13 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <Select
             id="project"
             labelText="Project"
-            {...register('project')}
-            invalid={!!errors.project}
-            invalidText={errors.project?.message}
-            value={watch('project')}
+            {...register('projectId')}
+            invalid={!!errors.projectId}
+            invalidText={errors.projectId?.message}
+            value={watch('projectId')}
           >
             <SelectItem text="--Choose project--" value="" />
-            {project?.map((item, index) => (
+            {projectId?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.projectId} />
             ))}
           </Select>
@@ -165,13 +204,13 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <Select
             id="department"
             labelText="Department"
-            {...register('department')}
-            invalid={!!errors.department}
-            invalidText={errors.department?.message}
-            value={watch('department')}
+            {...register('departmentId')}
+            invalid={!!errors.departmentId}
+            invalidText={errors.departmentId?.message}
+            value={watch('departmentId')}
           >
             <SelectItem text="--Choose department--" value="" />
-            {department?.map((item, index) => (
+            {departmentId?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.departmentId} />
             ))}
           </Select>
@@ -180,13 +219,13 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <Select
             id="site"
             labelText="Site"
-            {...register('site')}
-            invalid={!!errors.site}
-            invalidText={errors.site?.message}
-            value={watch('site')}
+            {...register('siteId')}
+            invalid={!!errors.siteId}
+            invalidText={errors.siteId?.message}
+            value={watch('siteId')}
           >
             <SelectItem text="--Choose site--" value="" />
-            {site?.map((item, index) => (
+            {siteId?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.siteId} />
             ))}
           </Select>
@@ -195,13 +234,13 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <Select
             id="county"
             labelText="County"
-            {...register('county')}
-            invalid={!!errors.county}
-            invalidText={errors.county?.message}
-            value={watch('county')}
+            {...register('countyId')}
+            invalid={!!errors.countyId}
+            invalidText={errors.countyId?.message}
+            value={watch('countyId')}
           >
             <SelectItem text="--Choose county--" value="" />
-            {county?.map((item, index) => (
+            {countyId?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.countyId} />
             ))}
           </Select>
@@ -210,13 +249,13 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <Select
             id="countyBudget"
             labelText="County budget"
-            {...register('countyBudget')}
-            invalid={!!errors.countyBudget}
-            invalidText={errors.countyBudget?.message}
-            value={watch('countyBudget')}
+            {...register('budgetId')}
+            invalid={!!errors.budgetId}
+            invalidText={errors.budgetId?.message}
+            value={watch('budgetId')}
           >
             <SelectItem text="--Choose county budget--" value="" />
-            {budget?.map((item, index) => (
+            {budgetId?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.budgetId} />
             ))}
           </Select>
@@ -225,13 +264,13 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <Select
             id="programArea"
             labelText="Program area"
-            {...register('programArea')}
-            invalid={!!errors.programArea}
-            invalidText={errors.programArea?.message}
-            value={watch('programArea')}
+            {...register('programId')}
+            invalid={!!errors.programId}
+            invalidText={errors.programId?.message}
+            value={watch('programId')}
           >
             <SelectItem text="--Choose program area--" value="" />
-            {program?.map((item, index) => (
+            {programId?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.programId} />
             ))}
           </Select>
@@ -294,7 +333,7 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           />
         </Column>
         <Column>
-          <Button type="submit" className={styles.submitBtn} kind="primary">
+          <Button type="submit" className={styles.submitBtn} disabled={edited} kind="primary">
             Save
           </Button>
         </Column>
