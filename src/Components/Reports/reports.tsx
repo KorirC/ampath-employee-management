@@ -20,7 +20,9 @@ import {
   TableHeader,
   TableRow,
   TableToolbar,
+  TableToolbarAction,
   TableToolbarContent,
+  TableToolbarMenu,
 } from 'carbon-components-react';
 import {
   getBudgets,
@@ -34,6 +36,7 @@ import {
 } from '../../commonResources/common.resource';
 import { exportPDF } from './exportPDF';
 import { Download16 as Download } from '@carbon/icons-react';
+import { CSVLink } from 'react-csv';
 
 export const EmployeeStatusReport: React.FC = () => {
   const [firstRowIndex, setFirstRowIndex] = React.useState(0);
@@ -72,6 +75,19 @@ export const EmployeeStatusReport: React.FC = () => {
       { key: 'site', header: 'Site' },
       { key: 'county', header: 'County' },
       { key: 'program', header: 'Program Area' },
+    ],
+    [],
+  );
+  const csvHeaders: Array<any> = useMemo(
+    () => [
+      { key: 'pfNumber', label: 'PF Number' },
+      { key: 'name', label: 'Name' },
+      { key: 'status', label: 'Contract Status' },
+      { key: 'department', label: 'Department' },
+      { key: 'project', label: 'Project' },
+      { key: 'site', label: 'Site' },
+      { key: 'county', label: 'County' },
+      { key: 'program', label: 'Program Area' },
     ],
     [],
   );
@@ -250,9 +266,22 @@ export const EmployeeStatusReport: React.FC = () => {
                 <TableContainer title="Employees Report" style={{ marginTop: '3rem' }}>
                   <TableToolbar>
                     <TableToolbarContent>
-                      <Button kind="secondary" onClick={() => exportPDF(report)} renderIcon={Download}>
-                        Download
-                      </Button>
+                      <TableToolbarMenu iconDescription="Download" renderIcon={Download}>
+                        <TableToolbarAction onClick={() => exportPDF(report)}>
+                          <a href="#">Download as pdf</a>{' '}
+                        </TableToolbarAction>
+                        <TableToolbarAction>
+                          <CSVLink
+                            data={report}
+                            headers={csvHeaders}
+                            filename={'Employee-Status-Report.csv'}
+                            className="btn btn-primary"
+                            target="_blank"
+                          >
+                            Download as csv
+                          </CSVLink>
+                        </TableToolbarAction>
+                      </TableToolbarMenu>
                     </TableToolbarContent>
                   </TableToolbar>
                   <Table {...getTableProps()}>
