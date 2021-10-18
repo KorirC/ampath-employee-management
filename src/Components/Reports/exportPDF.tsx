@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import ampath from '../../images/ampath.png';
 
 export const exportPDF = (report) => {
   let row: any[] = [];
@@ -22,6 +23,25 @@ export const exportPDF = (report) => {
   getReport(col, rowD, title);
 };
 
+let base64Img = null;
+
+function toDataUrl(url, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.onload = function () {
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      callback(reader.result);
+    };
+    reader.readAsDataURL(xhr.response);
+  };
+  xhr.open('GET', url);
+  xhr.responseType = 'blob';
+  xhr.send();
+}
+toDataUrl(ampath, function (myBase64) {
+  base64Img = myBase64;
+});
+
 function getReport(col: any[], rowD: any[], title: any) {
   let date = new Date();
   const totalPagesExp = '{total_pages_count_string}';
@@ -31,6 +51,9 @@ function getReport(col: any[], rowD: any[], title: any) {
   pdf.setLineWidth(1.5);
   // pdf.line(5, 107, 995, 107);
   var pageContent = function (data: { pageCount: string; settings: { margin: { left: any } } }) {
+    if (base64Img) {
+      pdf.addImage(base64Img, 'JPEG', data.settings.margin.left, 20, 0, 30);
+    }
     var str = 'Page ' + data.pageCount;
     if (typeof pdf.putTotalPages === 'function') {
       str = str + ' of ' + totalPagesExp + `          ` + `Generated on ${date}`;
