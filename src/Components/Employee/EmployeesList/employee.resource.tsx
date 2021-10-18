@@ -13,8 +13,6 @@ export const getAllEmployees = async () => {
       return response.json();
     })
     .then((res: any) => {
-      console.log(res);
-
       return res.data;
     })
     .catch((error: any) => {

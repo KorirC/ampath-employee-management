@@ -17,10 +17,14 @@ import {
   Pagination,
   DataTableSkeleton,
   Button,
+  TableToolbarAction,
+  TableToolbarMenu,
 } from 'carbon-components-react';
 import { Employee, getAllEmployees } from './employee.resource';
 import dayjs from 'dayjs';
 import { exportPDF } from './exportPDF';
+import { Download16 as Download } from '@carbon/icons-react';
+import { CSVLink } from 'react-csv';
 
 const EmployeeList: React.FC = () => {
   const history = useHistory();
@@ -38,6 +42,26 @@ const EmployeeList: React.FC = () => {
       { key: 'kraPin', header: 'KRA Pin' },
       { key: 'nssf', header: 'NSSF' },
       { key: 'nhif', header: 'NHIF' },
+    ],
+    [],
+  );
+
+  const csvHeaders: Array<any> = useMemo(
+    () => [
+      { key: 'pfNumber', label: 'PF' },
+      { key: 'name', label: 'Name' },
+      { key: 'telephone', label: 'Phone No' },
+      { key: 'email', label: 'Email' },
+      { key: 'kraPin', label: 'KRA Pin' },
+      { key: 'nssf', label: 'NSSF' },
+      { key: 'nhif', label: 'NHIF' },
+      { key: 'employeeStatus', label: 'Contract Status' },
+      { key: 'department', label: 'Department' },
+      { key: 'programArea', label: 'Program' },
+      { key: 'project', label: 'Project' },
+      { key: 'site', label: 'Site' },
+      { key: 'budget', label: 'Budget' },
+      { key: 'county', label: 'County' },
     ],
     [],
   );
@@ -116,6 +140,22 @@ const EmployeeList: React.FC = () => {
                 <TableToolbar>
                   <TableToolbarContent>
                     <TableToolbarSearch persistent={true} onChange={handleSearch} />
+                    <TableToolbarMenu iconDescription="Download" renderIcon={Download}>
+                      <TableToolbarAction onClick={() => exportPDF(employees)}>
+                        <a href="#">Download as pdf</a>{' '}
+                      </TableToolbarAction>
+                      <TableToolbarAction>
+                        <CSVLink
+                          data={employees}
+                          headers={csvHeaders}
+                          filename={'Employees-List.csv'}
+                          className="btn btn-primary"
+                          target="_blank"
+                        >
+                          Download as csv
+                        </CSVLink>
+                      </TableToolbarAction>
+                    </TableToolbarMenu>
                     <Button kind="secondary" onClick={registerEmployee}>
                       Create New Employee
                     </Button>
@@ -162,15 +202,6 @@ const EmployeeList: React.FC = () => {
               </TableContainer>
             )}
           </DataTable>
-          <br />
-          <Button
-            kind="secondary"
-            onClick={() => {
-              exportPDF(employees);
-            }}
-          >
-            Download
-          </Button>
         </>
       ) : (
         <DataTableSkeleton role="progressbar" />
