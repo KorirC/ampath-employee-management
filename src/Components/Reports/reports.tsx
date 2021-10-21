@@ -34,9 +34,9 @@ import {
   getSites,
   trackEmployees,
 } from '../../commonResources/common.resource';
-import { exportPDF } from './exportPDF';
 import { Download16 as Download } from '@carbon/icons-react';
 import { CSVLink } from 'react-csv';
+import { exportPDF } from './exportPDF';
 
 export const EmployeeStatusReport: React.FC = () => {
   const [firstRowIndex, setFirstRowIndex] = React.useState(0);
@@ -305,9 +305,11 @@ export const EmployeeStatusReport: React.FC = () => {
                         ))
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={8} style={{ textAlign: 'center' }}>
-                            <h5>No records found</h5>
-                          </TableCell>
+                          {headers.map((header: any) => (
+                            <TableHeader key={header.key} {...getHeaderProps({ header })}>
+                              {header.header}
+                            </TableHeader>
+                          ))}
                         </TableRow>
                       )}
                     </TableBody>

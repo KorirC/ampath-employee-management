@@ -39,12 +39,17 @@ export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
 
   return (
     <>
-      <Formik validationSchema={validationSchema} initialValues={formValues} onSubmit={onFormSubmit}>
+      <Formik
+        data-testid="login-form"
+        validationSchema={validationSchema}
+        initialValues={formValues}
+        onSubmit={onFormSubmit}
+      >
         {({ handleChange, setFieldValue, handleBlur, values, touched, errors }) => (
           <Form className={styles.loginform}>
-            <div className="bx--grid">
+            <div className="bx--grid bx--grid--narrow">
               <div className="bx--row">
-                <div>
+                <div className="bx--col">
                   <img src={ampath} className={styles.ampath} />
                   <TextInput
                     id="userName"
@@ -63,7 +68,7 @@ export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
                   <PasswordInput
                     id="password"
                     hidePasswordLabel="Hide password"
-                    labelText="Password: "
+                    labelText="Password:"
                     required
                     placeholder="Enter Password"
                     showPasswordLabel="Show password"
