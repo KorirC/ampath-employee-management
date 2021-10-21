@@ -11,10 +11,12 @@ import {
   Modal,
   Row,
   Column,
+  Pagination,
+  DataTableRow,
 } from 'carbon-components-react';
 import { useEffect, useMemo, useState } from 'react';
 import styles from './employee-profile.module.css';
-import { getEmployeeProfile, getTimesheet } from './EmployeeProfileConnection';
+import { deleteTimesheet, getEmployeeProfile, getTimesheet } from './EmployeeProfileConnection';
 import dayjs from 'dayjs';
 import { ShowTimesheet } from '../Profile/timesheetImage';
 import { useParams, useHistory, Link } from 'react-router-dom';
@@ -26,6 +28,10 @@ const headerData = [
   {
     header: 'Timesheet Link',
     key: 'timesheetLink',
+  },
+  {
+    header: 'Action',
+    key: 'action',
   },
 ];
 interface EmployeeDetails {
@@ -58,26 +64,43 @@ interface ParentCallbackProps {
 const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
   const [timesheets, setTimesheet] = useState([]);
   const [open, setOpen] = useState(false);
+  const [firstRowIndex, setFirstRowIndex] = useState(0);
+  const [currentPageSize, setCurrentPageSize] = useState(5);
   const [employeeDetails, setEmployeeDetails] = useState<EmployeeDetails>();
   const history = useHistory();
   const { pfNumber } = useParams<{ pfNumber?: string }>();
 
   const pf = Number(pfNumber);
 
+  const remove = (id) => {
+    deleteTimesheet(id);
+    window.location.reload();
+  };
   useMemo(() => {
     getTimesheet(pf).then((res) => {
-      const results = res.map((timesheet: any) => {
-        return {
-          id: `${timesheet.timesheetsId}`,
-          pfNumber: timesheet.pfnumber,
-          month: dayjs(timesheet.month).format('MMMM YYYY'),
-          timesheetLink: (
-            <Link to={`/image/${timesheet.upload}`} onClick={() => setOpen(true)}>
-              {timesheet.upload}
-            </Link>
-          ),
-        };
-      });
+      const results = res
+        .sort((a: any, b: any) => (b.month > a.month ? 1 : -1))
+        .map((timesheet: any) => {
+          return {
+            id: `${timesheet.timesheetsId}`,
+            pfNumber: timesheet.pfnumber,
+            month: dayjs(timesheet.month).format('MMMM YYYY'),
+            timesheetLink: (
+              <Link to={`/image/${timesheet.upload}`} onClick={() => setOpen(true)}>
+                {timesheet.upload}
+              </Link>
+            ),
+            action: (
+              <a
+                onClick={(e) => {
+                  if (window.confirm('Delete timesheet?')) remove(timesheet.timesheetsId);
+                }}
+              >
+                Delete
+              </a>
+            ),
+          };
+        });
       setTimesheet(results);
     });
     getEmployeeProfile(pf)
@@ -89,12 +112,16 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
       .catch((error) => {
         throw error;
       });
-  }, [getTimesheet]);
+  }, []);
 
   const handleClick = () => {
     props.parentCallback?.({ pfNumber: pf, edit: employeeDetails });
     history.push('/AddEmployeeTracking');
   };
+  const getRowItems = (rows: Array<DataTableRow>) => {
+    return rows.slice(firstRowIndex, firstRowIndex + currentPageSize).map((row: any) => ({ ...row }));
+  };
+  const rows = getRowItems(timesheets);
   return (
     <>
       <div className={styles.card}>
@@ -107,7 +134,7 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
             <p>{employeeDetails?.telephone}</p>
             <p>PF Number: {employeeDetails?.pfNumber}</p>
             <div>
-              <DataTable rows={timesheets} headers={headerData}>
+              <DataTable rows={rows} headers={headerData}>
                 {({ rows, headers, getHeaderProps, getTableProps }) => (
                   <TableContainer>
                     <Table {...getTableProps()}>
@@ -128,6 +155,21 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
                         ))}
                       </TableBody>
                     </Table>
+                    <Pagination
+                      totalItems={timesheets.length}
+                      backwardText="Previous page"
+                      forwardText="Next page"
+                      itemsPerPageText="Items per page:"
+                      pageNumberText="Page Number"
+                      pageSize={currentPageSize}
+                      pageSizes={[5, 10, 15, 20, 25]}
+                      onChange={({ page, pageSize }) => {
+                        if (pageSize !== currentPageSize) {
+                          setCurrentPageSize(pageSize);
+                        }
+                        setFirstRowIndex(pageSize * (page - 1));
+                      }}
+                    />
                   </TableContainer>
                 )}
               </DataTable>
