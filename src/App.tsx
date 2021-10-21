@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route, useHistory, Switch } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Route, useHistory, Switch } from 'react-router-dom';
 import styles from './App.module.css';
-import NavigationBar from './Components/Navigation/NavigationBar';
 import { Login } from './Components/Login/login';
 import ProtectedRoutes from './Components/ProtectedRoutes/ProtectedRoutes';
 import { Register } from './Components/Register/register';
@@ -17,7 +15,6 @@ import {
   HeaderMenuItem,
   HeaderGlobalBar,
   HeaderGlobalAction,
-  Modal,
 } from 'carbon-components-react';
 import { Dashboard } from './Components/Dashboard/dashboard';
 import Employeeprofile from './Components/Employee/Profile/employee-profile';
@@ -53,20 +50,12 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     {
-      token !== null ? setIsAuthenticated(true) : setIsAuthenticated(false);
+      token !== null ? setIsAuthenticated(true) : isAuthenticated;
     }
-  });
-
+  }, []);
   return (
     <>
-      {!isAuthenticated ? (
-        <>
-          <Route exact path="/">
-            <Login setIsAuthenticated={setIsAuthenticated} />
-          </Route>
-          <Route path="/RegisterUser" component={Register}></Route>
-        </>
-      ) : (
+      {isAuthenticated ? (
         <>
           <HeaderContainer
             render={({ isSideNavExpanded, onClickSideNavExpand }) => (
@@ -83,7 +72,7 @@ function App() {
                   </HeaderName>
                   <HeaderNavigation aria-label="AMPATH">
                     <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
-                    <HeaderMenuItem onClick={() => setOpen(true)}>Timesheets</HeaderMenuItem>
+                    <HeaderMenuItem href="/Timesheet">Timesheets</HeaderMenuItem>
                     <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
                   </HeaderNavigation>
                   <HeaderGlobalBar>
@@ -103,42 +92,37 @@ function App() {
               </>
             )}
           />
-          <div>
-            <Switch>
-              <ProtectedRoutes path="/Home" component={Dashboard} IsAuthenticated={isAuthenticated} />
-              <ProtectedRoutes path="/Reports" component={EmployeeStatusReport} IsAuthenticated={isAuthenticated} />
-              <ProtectedRoutes
-                path="/EmployeeRegistration"
-                component={EmployeeRegistrationForm}
-                IsAuthenticated={isAuthenticated}
-              />
-              <Route path="/login" component={Login}></Route>
-              <Route path="/image/:filename" component={ShowTimesheet} />
-              <ProtectedRoutes
-                path="/EmployeeProfile/:pfNumber"
-                component={() => <Employeeprofile parentCallback={handleCallback} />}
-                IsAuthenticated={isAuthenticated}
-              />
-              <ProtectedRoutes
-                path="/AddEmployeeTracking"
-                component={EmployeeTrackingForm}
-                IsAuthenticated={isAuthenticated}
-              >
-                <EmployeeTrackingForm pfNumber={callBackValues?.pfNumber} edit={callBackValues?.edit} />
-              </ProtectedRoutes>
-            </Switch>
-          </div>
-          <Modal
-            open={open}
-            preventCloseOnClickOutside
-            passiveModal
-            onRequestClose={() => {
-              setOpen(false);
-            }}
-          >
-            <TimesheetUpload />
-          </Modal>
+          <Switch>
+            <ProtectedRoutes path="/Home" component={Dashboard} IsAuthenticated={isAuthenticated} />
+            <ProtectedRoutes path="/Reports" component={EmployeeStatusReport} IsAuthenticated={isAuthenticated} />
+            <Route path="/Timesheet" component={TimesheetUpload} />
+            <ProtectedRoutes
+              path="/EmployeeRegistration"
+              component={EmployeeRegistrationForm}
+              IsAuthenticated={isAuthenticated}
+            />
+            <Route path="/image/:filename" component={ShowTimesheet} />
+            <ProtectedRoutes
+              path="/EmployeeProfile/:pfNumber"
+              component={() => <Employeeprofile parentCallback={handleCallback} />}
+              IsAuthenticated={isAuthenticated}
+            />
+            <ProtectedRoutes
+              path="/AddEmployeeTracking"
+              component={EmployeeTrackingForm}
+              IsAuthenticated={isAuthenticated}
+            >
+              <EmployeeTrackingForm pfNumber={callBackValues?.pfNumber} edit={callBackValues?.edit} />
+            </ProtectedRoutes>
+          </Switch>
         </>
+      ) : (
+        <Switch>
+          <Route exact path="/">
+            <Login setIsAuthenticated={setIsAuthenticated} />
+          </Route>
+          <Route path="/RegisterUser" component={Register}></Route>
+        </Switch>
       )}
     </>
   );
