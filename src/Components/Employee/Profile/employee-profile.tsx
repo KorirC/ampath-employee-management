@@ -45,17 +45,7 @@ interface EmployeeDetails {
   Site: string;
 }
 
-interface EmployeeProfileProps {
-  parentCallback?(evnt): void;
-}
-
-export type Action = 'Add' | 'Edit';
-interface ParentCallbackProps {
-  pfNumber: number;
-  Action: Action;
-}
-
-const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
+const Employeeprofile: React.FC = () => {
   const [timesheets, setTimesheet] = useState([]);
   const [open, setOpen] = useState(false);
   const [employeeDetails, setEmployeeDetails] = useState<EmployeeDetails>();
@@ -92,8 +82,7 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
   }, [getTimesheet]);
 
   const handleClick = () => {
-    props.parentCallback?.({ pfNumber: pf, edit: employeeDetails });
-    history.push('/AddEmployeeTracking');
+    history.push(`/AddEmployeeTracking/${pfNumber}`);
   };
   return (
     <>

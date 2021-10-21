@@ -25,15 +25,10 @@ import {
   getProjects,
   getSites,
 } from '../../../commonResources/common.resource';
-import { useHistory } from 'react-router';
+import { useHistory, useParams } from 'react-router-dom';
+import { getEmployeeProfile } from './employee-tracking-resource';
 
-export interface EmployeeTrackingFormProps {
-  pfNumber: number | undefined;
-  parentCallback?(evnt): void;
-  edit?: EmployeeTrackingInputProps;
-}
-
-export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props) => {
+export const EmployeeTrackingForm: React.FC = () => {
   const [projectId, setProject] = useState<Array<any>>([]);
   const [departmentId, setDepartment] = useState<Array<any>>();
   const [siteId, setSite] = useState<Array<any>>();
@@ -42,17 +37,17 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
   const [programId, setProgram] = useState<Array<any>>();
   const [formSuccess, setFormSuccess] = useState<boolean>(false);
   const [formError, setFormError] = useState<boolean>(false);
+  const [editValues, setEditValues] = useState<Object>();
   const [edited, setEdited] = useState<boolean>(false);
   const history = useHistory();
+  const { pfNumber } = useParams<{ pfNumber: string }>();
   const {
     register,
     setValue,
-    getValues,
     watch,
     handleSubmit,
     formState: { errors, touchedFields },
   } = useForm({ resolver: yupResolver(validationSchema), mode: 'all' });
-  const editValues = props.edit;
   const inputNames = [
     'projectId',
     'departmentId',
@@ -66,6 +61,26 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
     'jobSpecification',
   ];
 
+  useEffect(() => {
+    getEmployeeProfile(Number(pfNumber))
+      .then((response) => {
+        response
+          .filter(
+            (resp) =>
+              resp.projectId != null &&
+              resp.departmentId != null &&
+              resp.siteId != null &&
+              resp.countyId != null &&
+              resp.budgetId != null &&
+              resp.programId != null,
+          )
+          .map((resp) => setEditValues(resp));
+      })
+      .catch((errors) => {
+        throw errors;
+      });
+  }, [pfNumber]);
+
   useMemo(() => {
     editValues && setEdited(true);
     inputNames.map((name) => {
@@ -74,7 +89,7 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
         .map((values) => {
           const initialValues =
             values[0] === 'endOfContract' || values[0] === 'dateOfJoining' || values[0] === 'dateOfLeaving'
-              ? new Date(values[1])
+              ? new Date(`${values[1]}`)
               : values[1];
           setValue(values[0], initialValues);
         });
@@ -98,7 +113,7 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
   }, [{ ...touchedFields }, editValues]);
 
   const handleFormSubmit = (values: EmployeeTrackingInputProps) => {
-    values.pfNumber = props.pfNumber;
+    values.pfNumber = Number(pfNumber);
     values.project = values.projectId;
     values.department = values.departmentId;
     values.site = values.siteId;
@@ -108,18 +123,15 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
     values.endOfContract = dayjs(values.endOfContract).format('YYYY-MM-DD');
     values.dateOfJoining = dayjs(values.dateOfJoining).format('YYYY-MM-DD');
     values.dateOfLeaving = dayjs(values.dateOfLeaving).format('YYYY-MM-DD');
-    console.log('Values', values);
     saveEmployeeTrackingInformation(values)
       .then((response) => {
         if (response.status === 200) {
           setFormSuccess(true);
-          props.parentCallback?.({ formSuccess: true });
-          setTimeout(() => history.push(`/EmployeeProfile/${props.pfNumber}`), 2000);
+          setTimeout(() => history.push(`/EmployeeProfile/${pfNumber}`), 2000);
         }
       })
       .catch((error) => {
         setFormError(true);
-        props.parentCallback?.({ formSuccess: false });
       });
   };
 

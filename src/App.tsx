@@ -22,22 +22,12 @@ import { ShowTimesheet } from './Components/Employee/Profile/timesheetImage';
 import { EmployeeRegistrationForm } from './Components/Employee/Registration/employee-registration.component';
 import { EmployeeTrackingForm } from './Components/Employee/Tracking/employee-tracking.component';
 import { EmployeeStatusReport } from './Components/Reports/reports';
-import { EmployeeTrackingInputProps } from './Components/Employee/Tracking/employee-tracking-types';
 import TimesheetUpload from './Components/Timesheets/timesheetUpload';
-interface CallBackValuesProps {
-  pfNumber: number;
-  edit?: EmployeeTrackingInputProps;
-}
 
 function App() {
   const [open, setOpen] = useState<boolean>(false);
   const [sidebar, setSidebar] = useState<boolean>(true);
-  const [callBackValues, setCallBackValues] = useState<CallBackValuesProps>();
   const history = useHistory();
-
-  const handleCallback = (data) => {
-    setCallBackValues(data);
-  };
 
   const onClickSideNavClosed = () => {
     if (sidebar == true) {
@@ -104,16 +94,14 @@ function App() {
             <Route path="/image/:filename" component={ShowTimesheet} />
             <ProtectedRoutes
               path="/EmployeeProfile/:pfNumber"
-              component={() => <Employeeprofile parentCallback={handleCallback} />}
+              component={Employeeprofile}
               IsAuthenticated={isAuthenticated}
             />
             <ProtectedRoutes
-              path="/AddEmployeeTracking"
+              path="/AddEmployeeTracking/:pfNumber"
               component={EmployeeTrackingForm}
               IsAuthenticated={isAuthenticated}
-            >
-              <EmployeeTrackingForm pfNumber={callBackValues?.pfNumber} edit={callBackValues?.edit} />
-            </ProtectedRoutes>
+            />
           </Switch>
         </>
       ) : (

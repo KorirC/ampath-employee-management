@@ -16,3 +16,20 @@ export const saveEmployeeTrackingInformation = async (values: EmployeeTrackingIn
       return error;
     });
 };
+
+export const getEmployeeProfile = async (pf) => {
+  return await fetch(baseUrl + `/search?pfnumber=${pf}`, {
+    headers: {
+      Authorization: `Bearer  ${token}`,
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((res: any) => {
+      return res.data;
+    })
+    .catch((error: any) => {
+      return error;
+    });
+};
