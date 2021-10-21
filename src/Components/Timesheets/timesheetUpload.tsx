@@ -1,5 +1,15 @@
 import React, { useMemo, useState } from 'react';
-import { Form, TextInput, FileUploader, Button, Grid, Column, Row, ToastNotification } from 'carbon-components-react';
+import {
+  Form,
+  TextInput,
+  FileUploader,
+  Button,
+  Grid,
+  Column,
+  Row,
+  ToastNotification,
+  Modal,
+} from 'carbon-components-react';
 import { getAllEmployees, uploadTimesheet } from '../Timesheets/timesheet.resource';
 import FilterableMultiSelect from 'carbon-components-react/lib/components/MultiSelect/FilterableMultiSelect';
 import styles from './timesheet.module.scss';
@@ -13,6 +23,7 @@ const TimesheetUpload: React.FC = () => {
   const [month, setMonth] = useState('');
   const [formSuccess, setFormSuccess] = useState<boolean>(false);
   const [formError, setFormError] = useState<boolean>(false);
+  const [open, setOpen] = useState(true);
 
   const handleImageChange = (e: any) => {
     setSelectedFiles(e.target.files[0]);
@@ -32,7 +43,6 @@ const TimesheetUpload: React.FC = () => {
       .then((res: any) => {
         if (res.status === 200) {
           setFormSuccess(true);
-          // history.goBack();
         }
       })
       .catch((error) => {
@@ -57,66 +67,58 @@ const TimesheetUpload: React.FC = () => {
 
   return (
     <>
-      <Grid>
-        {formSuccess && (
-          <ToastNotification
-            title="Data saved successfully"
-            className={styles.toast}
-            timeout={3000}
-            subtitle="Employee tracking data saved successfully"
-            kind="success"
-          />
-        )}
-        {formError && (
-          <ToastNotification
-            title="Error saving data"
-            className={styles.toast}
-            timeout={3000}
-            subtitle="Employee tracking data not saved"
-            kind="error"
-          />
-        )}
-        <Row>
-          <Column>
-            <Form onSubmit={upload} encType="multipart/form-data" className={styles.form}>
-              <h5>Upload Timesheet</h5>
-              <br />
-              <FilterableMultiSelect
-                id=""
-                items={employees}
-                itemToString={(item: { pfNumber: string; name: string }) =>
-                  item ? `${item.pfNumber + ' - ' + item.name}` : ''
-                }
-                placeholder="Select Employee(s)"
-                selectionFeedback="fixed"
-                onChange={(e: any) => setSelectEmployees(e.selectedItems)}
-              />
-              <TextInput
-                id=""
-                labelText="Month"
-                type="date"
-                className="form-control"
-                min="2018-03"
-                onChange={(e) => setMonth(e.target.value)}
-                value={month}
-              />
-              <FileUploader
-                buttonKind="secondary"
-                accept={['.jpg', '.png']}
-                buttonLabel="Add file"
-                iconDescription="Clear file"
-                filenameStatus="edit"
-                multiple={false}
-                onChange={handleImageChange}
-              />
+      <Modal
+        open={open}
+        preventCloseOnClickOutside
+        passiveModal
+        onRequestClose={() => {
+          setOpen(false);
+          history.push('/Home');
+        }}
+      >
+        <Grid>
+          <Row>
+            <Column>
+              <Form onSubmit={upload} encType="multipart/form-data" className={styles.form}>
+                <h5>Upload Timesheet</h5>
+                <br />
+                <FilterableMultiSelect
+                  id=""
+                  items={employees}
+                  itemToString={(item: { pfNumber: string; name: string }) =>
+                    item ? `${item.pfNumber + ' - ' + item.name}` : ''
+                  }
+                  placeholder="Select Employee(s)"
+                  selectionFeedback="fixed"
+                  onChange={(e: any) => setSelectEmployees(e.selectedItems)}
+                />
+                <TextInput
+                  id=""
+                  labelText="Month"
+                  type="date"
+                  className="form-control"
+                  min="2018-03"
+                  onChange={(e) => setMonth(e.target.value)}
+                  value={month}
+                />
+                <FileUploader
+                  buttonKind="secondary"
+                  accept={['.jpg', '.png']}
+                  buttonLabel="Add file"
+                  iconDescription="Clear file"
+                  filenameStatus="edit"
+                  multiple={false}
+                  onChange={handleImageChange}
+                />
 
-              <Button type="submit" disabled={!selectedFiles} kind="secondary" style={{ marginTop: '1rem' }}>
-                Upload TimeSheet
-              </Button>
-            </Form>
-          </Column>
-        </Row>
-      </Grid>
+                <Button type="submit" disabled={!selectedFiles} kind="secondary" style={{ marginTop: '1rem' }}>
+                  Upload TimeSheet
+                </Button>
+              </Form>
+            </Column>
+          </Row>
+        </Grid>
+      </Modal>
     </>
   );
 };
