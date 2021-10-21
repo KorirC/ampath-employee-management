@@ -66,8 +66,9 @@ const EmployeeList: React.FC = () => {
     [],
   );
 
+  const token = localStorage.getItem('token');
   useMemo(() => {
-    getAllEmployees().then((res) => {
+    getAllEmployees(token).then((res) => {
       const results = res.map((employee: any) => {
         return {
           ...employee,
