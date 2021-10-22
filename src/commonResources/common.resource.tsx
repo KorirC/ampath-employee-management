@@ -11,6 +11,7 @@ export const getCounties = async () => {
     return response.data;
   });
 };
+
 export const getDepartments = async () => {
   return await useFetch(`${url}/department`, {
     headers: {
@@ -20,6 +21,7 @@ export const getDepartments = async () => {
     return response.data;
   });
 };
+
 export const getProjects = async () => {
   return await useFetch(`${url}/project`, {
     headers: {
@@ -29,6 +31,7 @@ export const getProjects = async () => {
     return response.data;
   });
 };
+
 export const getPrograms = async () => {
   return await useFetch(`${url}/program`, {
     headers: {
@@ -38,6 +41,7 @@ export const getPrograms = async () => {
     return response.data;
   });
 };
+
 export const getSites = async () => {
   return await useFetch(`${url}/site`, {
     headers: {
@@ -47,6 +51,7 @@ export const getSites = async () => {
     return response.data;
   });
 };
+
 export const getBudgets = async () => {
   return await useFetch(`${url}/budget`, {
     headers: {
@@ -56,6 +61,7 @@ export const getBudgets = async () => {
     return response.data;
   });
 };
+
 export const trackEmployees = async () => {
   return await useFetch(`${url}/movement`, {
     headers: {
@@ -65,6 +71,7 @@ export const trackEmployees = async () => {
     return response.data;
   });
 };
+
 export const getReport = async (param: any) => {
   return await useFetch(
     `${url}/report?department=${param.department}&project=${param.project}&site=${param.site}&budget=${param.budget}&county=${param.county}&status=${param.contractStatus}&program=${param.programArea}`,
@@ -76,4 +83,21 @@ export const getReport = async (param: any) => {
   ).then((response) => {
     return response.data;
   });
+};
+
+export const getEmployeeProfile = async (pf) => {
+  return await fetch(url + `/search?pfnumber=${pf}`, {
+    headers: {
+      Authorization: `Bearer  ${token}`,
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((res: any) => {
+      return res.data;
+    })
+    .catch((error: any) => {
+      return error;
+    });
 };

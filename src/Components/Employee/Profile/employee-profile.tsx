@@ -82,7 +82,7 @@ const Employeeprofile: React.FC = () => {
   }, [getTimesheet]);
 
   const handleClick = () => {
-    history.push(`/AddEmployeeTracking/${pfNumber}`);
+    history.push(`/AddEmployeeTracking/${pfNumber}`, history.location.pathname);
   };
   return (
     <>

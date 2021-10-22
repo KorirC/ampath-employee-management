@@ -26,7 +26,8 @@ import {
   getSites,
 } from '../../../commonResources/common.resource';
 import { useHistory, useParams } from 'react-router-dom';
-import { getEmployeeProfile } from './employee-tracking-resource';
+import { getEmployeeProfile } from '../../../commonResources/common.resource';
+import { Modal } from 'carbon-components-react';
 
 export const EmployeeTrackingForm: React.FC = () => {
   const [projectId, setProject] = useState<Array<any>>([]);
@@ -39,8 +40,11 @@ export const EmployeeTrackingForm: React.FC = () => {
   const [formError, setFormError] = useState<boolean>(false);
   const [editValues, setEditValues] = useState<Object>();
   const [edited, setEdited] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const history = useHistory();
   const { pfNumber } = useParams<{ pfNumber: string }>();
+
   const {
     register,
     setValue,
@@ -60,6 +64,11 @@ export const EmployeeTrackingForm: React.FC = () => {
     'dateOfLeaving',
     'jobSpecification',
   ];
+
+  const prevUrl = `${history.location.state}`;
+  useEffect(() => {
+    prevUrl.match(/\/EmployeeRegistration(\/)?$/g) ? setShowModal(true) : setShowModal(false);
+  }, [prevUrl]);
 
   useEffect(() => {
     getEmployeeProfile(Number(pfNumber))
@@ -127,12 +136,20 @@ export const EmployeeTrackingForm: React.FC = () => {
       .then((response) => {
         if (response.status === 200) {
           setFormSuccess(true);
-          setTimeout(() => history.push(`/EmployeeProfile/${pfNumber}`), 2000);
+          setTimeout(() => setOpen(true), 2000);
         }
       })
       .catch((error) => {
         setFormError(true);
       });
+  };
+
+  const goToProfile = (e) => {
+    history.push(`/EmployeeProfile/${pfNumber}`);
+  };
+
+  const goToNewRegistration = (e) => {
+    history.goBack();
   };
 
   useMemo(() => {
@@ -180,7 +197,7 @@ export const EmployeeTrackingForm: React.FC = () => {
         <ToastNotification
           title="Data saved successfully"
           className={styles.toast}
-          timeout={3000}
+          timeout={2000}
           subtitle="Employee tracking data saved successfully"
           kind="success"
         />
@@ -189,7 +206,7 @@ export const EmployeeTrackingForm: React.FC = () => {
         <ToastNotification
           title="Error saving data"
           className={styles.toast}
-          timeout={3000}
+          timeout={2000}
           subtitle="Employee tracking data not saved"
           kind="error"
         />
@@ -348,6 +365,26 @@ export const EmployeeTrackingForm: React.FC = () => {
           <Button type="submit" className={styles.submitBtn} disabled={edited} kind="primary">
             Save
           </Button>
+          <Modal
+            open={showModal && open}
+            onRequestClose={(e) => {
+              setOpen(false);
+              goToProfile;
+            }}
+            passiveModal
+            preventCloseOnClickOutside
+            modalHeading="Registration successfully completed"
+          >
+            <p>Would you like to start a new registration or continue to the employee profile?</p>
+            <div className={styles.modalBtn}>
+              <Button onClick={goToNewRegistration} className={styles.registerBtn}>
+                Start a new registration?
+              </Button>
+              <Button kind="tertiary" onClick={goToProfile} className={styles.continueBtn}>
+                Continue to profile?
+              </Button>
+            </div>
+          </Modal>
         </Column>
       </Form>
     </>

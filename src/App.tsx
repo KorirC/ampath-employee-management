@@ -87,7 +87,7 @@ function App() {
             <ProtectedRoutes path="/Reports" component={EmployeeStatusReport} IsAuthenticated={isAuthenticated} />
             <Route path="/Timesheet" component={TimesheetUpload} />
             <ProtectedRoutes
-              path="/EmployeeRegistration"
+              path="/EmployeeRegistration/:pfNumber?"
               component={EmployeeRegistrationForm}
               IsAuthenticated={isAuthenticated}
             />
