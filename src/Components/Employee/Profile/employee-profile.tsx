@@ -8,17 +8,15 @@ import {
   TableBody,
   TableCell,
   Button,
-  Modal,
   Row,
   Column,
   Pagination,
   DataTableRow,
 } from 'carbon-components-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './employee-profile.module.css';
 import { deleteTimesheet, getEmployeeProfile, getTimesheet } from './EmployeeProfileConnection';
 import dayjs from 'dayjs';
-import { ShowTimesheet } from '../Profile/timesheetImage';
 import { useParams, useHistory, Link } from 'react-router-dom';
 const headerData = [
   {
@@ -72,11 +70,7 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
 
   const pf = Number(pfNumber);
 
-  const remove = (id) => {
-    deleteTimesheet(id);
-    window.location.reload();
-  };
-  useMemo(() => {
+  const timesheet = () => {
     getTimesheet(pf).then((res) => {
       const results = res
         .sort((a: any, b: any) => (b.month > a.month ? 1 : -1))
@@ -92,6 +86,7 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
             ),
             action: (
               <a
+                href="#"
                 onClick={(e) => {
                   if (window.confirm('Delete timesheet?')) remove(timesheet.timesheetsId);
                 }}
@@ -103,6 +98,10 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
         });
       setTimesheet(results);
     });
+  };
+
+  useMemo(() => {
+    timesheet();
     getEmployeeProfile(pf)
       .then((response) => {
         const result = response.map((resp) => {
@@ -113,6 +112,12 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
         throw error;
       });
   }, []);
+
+  const remove = (id) => {
+    deleteTimesheet(id).then(() => {
+      timesheet();
+    });
+  };
 
   const handleClick = () => {
     props.parentCallback?.({ pfNumber: pf, edit: employeeDetails });
