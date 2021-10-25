@@ -51,6 +51,24 @@ export const getSingleTimesheet = async (filename) => {
     });
 };
 
+export const deleteTimesheet = async (timesheetId) => {
+  return await fetch(BaseUrl + `/delete?timesheetId=${timesheetId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer  ${token}`,
+    },
+  })
+    .then((response) => {
+      return response;
+    })
+    .then((res: any) => {
+      return res;
+    })
+    .catch((error: any) => {
+      return error;
+    });
+};
+
 export type Employee = {
   name: string;
   pfNumber: number;
