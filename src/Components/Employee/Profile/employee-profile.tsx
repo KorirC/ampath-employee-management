@@ -174,8 +174,11 @@ const Employeeprofile: React.FC = () => {
             </div>
             <p>
               <Button type="submit" className={styles.button} onClick={handleClick}>
-                Update Details
+                Update tracking details
               </Button>
+            </p>
+            <p className={styles.updateBtn}>
+              <Link to={`/EmployeeRegistration/${pf}`}> Update employee details</Link>
             </p>
           </Column>
         </Row>

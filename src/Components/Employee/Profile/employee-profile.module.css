@@ -75,6 +75,10 @@
   h3{
       font-family: auto;
   }
+
+  .updateBtn {
+    padding: 10px;
+  }
   /* a {
     text-decoration: none;
     font-size: 22px;

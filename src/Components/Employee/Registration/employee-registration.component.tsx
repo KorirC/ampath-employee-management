@@ -22,14 +22,20 @@ import styles from './employee-registration.module.scss';
 import { formValues } from './employee-registration-types';
 import { validationSchema } from './validation/employee-registration-validation';
 import { EmployeeRegistrationFormProps } from './employee-registration-types';
-import { saveEmployeeInformation } from './employee-registration.resource';
+import {
+  getEmployeeInformation,
+  saveEmployeeInformation,
+  updateEmployeeInformation,
+} from './employee-registration.resource';
 import { useHistory, useParams } from 'react-router-dom';
-import { getEmployeeProfile } from '../../../commonResources/common.resource';
 
 export const EmployeeRegistrationForm: React.FC = () => {
   const [formIsComplete, setFormIsComplete] = useState<boolean>(false);
   const [errorInForm, setErrorInForm] = useState<boolean>(false);
   const [pfNumber, setPfNumber] = useState<number>();
+  const [update, setUpdate] = useState<boolean>(false);
+  const [edited, setEdited] = useState<boolean>(false);
+  const [editValues, setEditValues] = useState<Object>();
   const history = useHistory();
   const { pfNumber: pf } = useParams<{ pfNumber: string }>();
 
@@ -37,20 +43,32 @@ export const EmployeeRegistrationForm: React.FC = () => {
     values: EmployeeRegistrationFormProps,
     helpers: FormikHelpers<EmployeeRegistrationFormProps>,
   ) => {
-    helpers.setSubmitting(true);
-    saveEmployeeInformation(values).then(
-      (response) => {
-        if (response.status === 200) {
-          setFormIsComplete(true);
-          setPfNumber(Number(values.pfNumber));
-        }
-      },
-      (error) => {
-        setErrorInForm(true);
-        setTimeout(() => setErrorInForm(false), 3000);
-        helpers.setSubmitting(false);
-      },
-    );
+    update
+      ? updateEmployeeInformation(values).then(
+          (response) => {
+            if (response.status === 200) {
+              setFormIsComplete(true);
+              setTimeout(() => history.push(`/EmployeeProfile/${pf}`), 1000);
+            } else {
+              setErrorInForm(true);
+            }
+          },
+          (error) => {
+            setErrorInForm(true);
+          },
+        )
+      : saveEmployeeInformation(values).then(
+          (response) => {
+            if (response.status === 200) {
+              setFormIsComplete(true);
+              setPfNumber(Number(values.pfNumber));
+            }
+          },
+          (error) => {
+            setErrorInForm(true);
+            setTimeout(() => setErrorInForm(false), 1000);
+          },
+        );
   };
 
   const formik = useFormik({
@@ -60,9 +78,48 @@ export const EmployeeRegistrationForm: React.FC = () => {
   });
 
   useEffect(() => {
+    pf &&
+      getEmployeeInformation(pf).then((response) => {
+        if (response) {
+          response.map((resp) => {
+            Object.entries(resp).map((data) => {
+              formik.setFieldValue(data[0], data[1]);
+              setUpdate(true);
+              setEditValues(resp);
+            });
+          });
+        }
+      });
+  }, [pf]);
+
+  useEffect(() => {
+    let entries: Array<{ name: string; sameValue: boolean }> = [];
+    editValues &&
+      Object.entries(formik.values).map(([key, value]) => {
+        Object.entries({ ...editValues })
+          .filter(([k]) => k === key)
+          .map((v) => {
+            const insertedValue = key === 'dob' ? dayjs(`${value}`).format('YYYY-MM-DD') : value;
+            const existingValue = v[0] === 'dob' ? dayjs(`${v[1]}`).format('YYYY-MM-DD') : v[1];
+            if (existingValue != insertedValue) {
+              entries.push({ name: v[0], sameValue: false });
+            } else {
+              entries.push({ name: v[0], sameValue: true });
+            }
+          });
+        const obj = entries.filter((k) => k.sameValue === false);
+        if (obj.length > 0) {
+          setEdited(false);
+        } else {
+          setEdited(true);
+        }
+      });
+  }, [formik.values, editValues]);
+
+  useEffect(() => {
     formIsComplete &&
       pfNumber &&
-      setTimeout(() => history.push(`/AddEmployeeTracking/${pfNumber}`, history.location.pathname), 2000);
+      setTimeout(() => history.push(`/AddEmployeeTracking/${pfNumber}`, history.location.pathname), 1000);
   }, [formIsComplete, pfNumber]);
 
   const basicRef = useRef<null | HTMLHeadingElement>(null);
@@ -170,6 +227,7 @@ export const EmployeeRegistrationForm: React.FC = () => {
                   }}
                   onBlur={formik.handleBlur}
                   maxDate={dayjs(new Date()).format('MM/DD/YYYY')}
+                  value={dayjs(formik.values.dob).format('MM/DD/YYYY')}
                 >
                   <DatePickerInput
                     id="dob"
@@ -187,6 +245,7 @@ export const EmployeeRegistrationForm: React.FC = () => {
                   onChange={(event) => {
                     formik.setFieldValue('gender', event);
                   }}
+                  valueSelected={formik.values.gender}
                 >
                   <RadioButton id="male" key="male" labelText="Male" value="Male" />
                   <RadioButton id="female" key="female" labelText="Female" value="Female" />
@@ -267,8 +326,8 @@ export const EmployeeRegistrationForm: React.FC = () => {
                   invalid={!!(formik.touched.nhif && formik.errors.nhif)}
                   invalidText={formik.errors.nhif}
                 />
-                <Button className={styles.submitBtn} type="submit">
-                  Save
+                <Button className={styles.submitBtn} disabled={edited} type="submit">
+                  {update ? 'Update' : 'Save'}
                 </Button>
               </Form>
             </Column>
@@ -278,10 +337,14 @@ export const EmployeeRegistrationForm: React.FC = () => {
       {formIsComplete && (
         <>
           <ToastNotification
-            title="Data saved successfully"
-            timeout={3000}
+            title={update ? 'Data updated successfully' : 'Data saved successfully'}
+            timeout={1000}
             className={styles.toast}
-            subtitle="Employee registration data saved successfully"
+            subtitle={
+              update
+                ? 'Employee registration data updated successfully'
+                : 'Employee registration data saved successfully'
+            }
             kind="success"
           />
         </>
@@ -289,7 +352,7 @@ export const EmployeeRegistrationForm: React.FC = () => {
       {errorInForm && (
         <ToastNotification
           title="Error saving data"
-          timeout={3000}
+          timeout={1000}
           className={styles.toast}
           subtitle="Employee registration data not saved"
           kind="error"

@@ -6,7 +6,6 @@ export const validationSchema = Yup.object().shape({
   lastName: Yup.string().trim().required('Lastname is required'),
   idNumber: Yup.number().typeError('Enter numbers only').required('Id number is required'),
   dob: Yup.date().required('Birthdate is required').max(Date(), 'Birthdate should not be in the future'),
-  age: Yup.number().typeError('Enter numbers only').optional(),
   telephone: Yup.string()
     .matches(/^(\+254|0)[17]\d{8}$/, 'Valid format: (+254/0) followed by (1/7) and finally the last 8 digits')
     .required('Phone number is required'),

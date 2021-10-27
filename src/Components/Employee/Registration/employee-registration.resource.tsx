@@ -31,3 +31,18 @@ export const updateEmployeeInformation = async (values: EmployeeRegistrationForm
       return error;
     });
 };
+
+export const getEmployeeInformation = async (pfNumber: string) => {
+  return await fetch(baseUrl + `/employeeregistration?pfnumber=${pfNumber}`, {
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer  ${token}` },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((resp) => {
+      return resp.data;
+    })
+    .catch((error) => {
+      return error;
+    });
+};
