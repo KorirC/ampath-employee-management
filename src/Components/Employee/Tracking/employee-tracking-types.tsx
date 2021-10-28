@@ -1,19 +1,27 @@
 export interface EmployeeTrackingInputProps {
-  pfNumber: number | undefined;
-  project: number;
-  department: number;
-  site: number;
-  county: number;
-  countyBudget: number;
-  programArea: number;
+  pfNumber: string;
+  project: string;
+  department: string;
+  site: string;
+  county: string;
+  countyBudget: string;
+  programArea: string;
   endOfContract: string;
   dateOfJoining: string;
   dateOfLeaving: string;
   jobSpecification: string;
-  projectId: number;
-  departmentId: number;
-  siteId: number;
-  countyId: number;
-  budgetId: number;
-  programId: number;
 }
+
+export const FormValues: EmployeeTrackingInputProps = {
+  pfNumber: '',
+  project: '',
+  department: '',
+  site: '',
+  county: '',
+  countyBudget: '',
+  programArea: '',
+  endOfContract: '',
+  dateOfJoining: '',
+  dateOfLeaving: '',
+  jobSpecification: '',
+};

@@ -17,8 +17,8 @@ export const saveEmployeeTrackingInformation = async (values: EmployeeTrackingIn
     });
 };
 
-export const getEmployeeProfile = async (pf) => {
-  return await fetch(baseUrl + `/search?pfnumber=${pf}`, {
+export const getEmployeeProfileInformation = async (pf) => {
+  return await fetch(baseUrl + `/trackmovement?pfnumber=${pf}`, {
     headers: {
       Authorization: `Bearer  ${token}`,
     },

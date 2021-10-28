@@ -173,7 +173,7 @@ const Employeeprofile: React.FC = () => {
               <p>Program: {employeeDetails?.ProgramArea}</p> <p>Site: {employeeDetails?.Site}</p>
             </div>
             <p>
-              <Button type="submit" className={styles.button} onClick={handleClick}>
+              <Button type="submit" className={styles.button} kind="primary" onClick={handleClick}>
                 Update tracking details
               </Button>
             </p>
