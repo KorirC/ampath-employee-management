@@ -18,6 +18,7 @@ import styles from './employee-profile.module.css';
 import { deleteTimesheet, getEmployeeProfile, getTimesheet } from './EmployeeProfileConnection';
 import dayjs from 'dayjs';
 import { useParams, useHistory, Link } from 'react-router-dom';
+import { calculate_age } from '../../../globals/calculateAge';
 const headerData = [
   {
     header: 'Month',
@@ -37,7 +38,7 @@ interface EmployeeDetails {
   middleName: string;
   lastName: string;
   idNumber: string;
-  dob: string;
+  dateOfBirth: string;
   age: number;
   telephone: string;
   email: string;
@@ -127,6 +128,7 @@ const Employeeprofile: React.FC = () => {
             <p className="title">{employeeDetails?.email}</p>
             <p>{employeeDetails?.telephone}</p>
             <p>PF Number: {employeeDetails?.pfNumber}</p>
+            <p>Age: {calculate_age(employeeDetails?.dateOfBirth)}</p>
             <div>
               <DataTable rows={rows} headers={headerData}>
                 {({ rows, headers, getHeaderProps, getTableProps }) => (
