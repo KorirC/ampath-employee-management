@@ -23,6 +23,7 @@ import { EmployeeRegistrationForm } from './Components/Employee/Registration/emp
 import { EmployeeTrackingForm } from './Components/Employee/Tracking/employee-tracking.component';
 import { EmployeeStatusReport } from './Components/Reports/reports';
 import TimesheetUpload from './Components/Timesheets/timesheetUpload';
+import Dimensions from './Components/Dimensions/dimensions';
 
 function App() {
   const [open, setOpen] = useState<boolean>(false);
@@ -64,6 +65,7 @@ function App() {
                     <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
                     <HeaderMenuItem href="/Timesheet">Timesheets</HeaderMenuItem>
                     <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
+                    <HeaderMenuItem href="/Dimensions">Dimensions</HeaderMenuItem>
                   </HeaderNavigation>
                   <HeaderGlobalBar>
                     <HeaderGlobalAction
@@ -85,6 +87,7 @@ function App() {
           <Switch>
             <ProtectedRoutes path="/Home" component={Dashboard} IsAuthenticated={isAuthenticated} />
             <ProtectedRoutes path="/Reports" component={EmployeeStatusReport} IsAuthenticated={isAuthenticated} />
+            <ProtectedRoutes path="/Dimensions" component={Dimensions} IsAuthenticated={isAuthenticated} />
             <Route path="/Timesheet" component={TimesheetUpload} />
             <ProtectedRoutes
               path="/EmployeeRegistration/:pfNumber?"
