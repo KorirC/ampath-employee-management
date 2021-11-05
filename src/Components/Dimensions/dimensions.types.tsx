@@ -72,7 +72,8 @@ export interface projectInputProps {
 export const projectValues: projectInputProps = { name: '' };
 
 export interface userInputProps {
-  name: string;
+  userName: string;
+  id: string;
 }
 
-export const userValues: projectInputProps = { name: '' };
+export const userValues: userInputProps = { userName: '', id: '' };

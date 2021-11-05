@@ -105,14 +105,35 @@ export const addProject = async (values) => {
     });
 };
 
-export const getUser = async (values) => {
+export const getUser = async (userName) => {
   const options = {
     headers: {
       Authorization: `Bearer  ${token}`,
       'Content-Type': 'application/json',
     },
   };
-  return await fetch(url + `/role`)
+  return await fetch(url + `/role?userName=${userName}`, options)
+    .then((response) => {
+      return response.json();
+    })
+    .then((res: any) => {
+      return res.data;
+    })
+    .catch((error: any) => {
+      return error;
+    });
+};
+
+export const updateRole = async (formData: any) => {
+  const options = {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer  ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: formData,
+  };
+  return await fetch(url + `/register`, options)
     .then((response) => {
       return response.json();
     })

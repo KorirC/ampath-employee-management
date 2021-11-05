@@ -74,6 +74,7 @@ const Project: React.FC = () => {
             <TextInput
               name="name"
               id="projects"
+              data-testid="projects"
               invalid={!!(touched.name && errors.name)}
               invalidText={errors.name}
               labelText="New Project Name"
@@ -83,10 +84,10 @@ const Project: React.FC = () => {
               onBlur={handleBlur}
             />
             <div>
-              <Button className={styles.btn} size="default" kind="primary" type="submit">
+              <Button className={styles.btn} size="default" kind="primary" type="submit" data-testid="add">
                 Add Project
               </Button>
-              <Button className={styles.btn} size="default" kind="secondary">
+              <Button className={styles.btn} size="default" kind="secondary" data-testid="cancel">
                 Cancel
               </Button>
             </div>

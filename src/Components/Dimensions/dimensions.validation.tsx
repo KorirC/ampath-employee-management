@@ -1,19 +1,5 @@
 import * as Yup from 'yup';
 
-// export const validationSchema = Yup.object().shape({
-//   name: Yup.string().required('Budget is required'),
-//   mflcode: Yup.string().required('MFL-Code is required'),
-//   county: Yup.string().required('County is required'),
-//   countyid: Yup.number().required('County ID is required'),
-//   counties: Yup.string().required('Select a county from the list'),
-//   department: Yup.string().required('Department is required'),
-//   departmentid: Yup.number().required('Department ID is required'),
-//   site: Yup.string().required('Site is required'),
-//   programs: Yup.string().required('Program is required'),
-//   project: Yup.string().required('Project is required'),
-//   user: Yup.string().required('User is required'),
-// });
-
 export const budgetSchema = Yup.object().shape({
   name: Yup.string().required('Budget is required'),
   mflCode: Yup.string().required('MFL-Code is required'),
