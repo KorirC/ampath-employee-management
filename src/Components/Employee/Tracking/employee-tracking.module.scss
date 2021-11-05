@@ -25,3 +25,14 @@
     right: 0;
     top: 2em;
 }
+
+.modalBtn {
+    position: relative;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    margin: 10px auto;
+}
+
+.modalBtn .continueBtn,.registerBtn {
+    margin: 1px;
+}

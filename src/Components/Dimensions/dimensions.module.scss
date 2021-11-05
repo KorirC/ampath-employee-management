@@ -1,0 +1,24 @@
+.heading {
+    text-align: center;
+    font-weight: bolder;
+    margin-top: 20px;
+    font-size: 30px;
+    margin-bottom: 40px;
+}
+  
+.form {
+    width:max-content;
+    margin: 10rem 20rem;
+    padding: clamp(15px, 5%, 50px);
+    text-align: center;
+    border: thin ridge teal;
+}
+
+.tabs{
+    font-size: 16px;
+}
+
+.btn {
+    margin: 5px;
+}
+

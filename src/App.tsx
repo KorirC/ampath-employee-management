@@ -22,22 +22,13 @@ import { ShowTimesheet } from './Components/Employee/Profile/timesheetImage';
 import { EmployeeRegistrationForm } from './Components/Employee/Registration/employee-registration.component';
 import { EmployeeTrackingForm } from './Components/Employee/Tracking/employee-tracking.component';
 import { EmployeeStatusReport } from './Components/Reports/reports';
-import { EmployeeTrackingInputProps } from './Components/Employee/Tracking/employee-tracking-types';
 import TimesheetUpload from './Components/Timesheets/timesheetUpload';
-interface CallBackValuesProps {
-  pfNumber: number;
-  edit?: EmployeeTrackingInputProps;
-}
+import Dimensions from './Components/Dimensions/dimensions';
 
 function App() {
   const [open, setOpen] = useState<boolean>(false);
   const [sidebar, setSidebar] = useState<boolean>(true);
-  const [callBackValues, setCallBackValues] = useState<CallBackValuesProps>();
   const history = useHistory();
-
-  const handleCallback = (data) => {
-    setCallBackValues(data);
-  };
 
   const onClickSideNavClosed = () => {
     if (sidebar == true) {
@@ -74,6 +65,7 @@ function App() {
                     <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
                     <HeaderMenuItem href="/Timesheet">Timesheets</HeaderMenuItem>
                     <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
+                    <HeaderMenuItem href="/Dimensions">Dimensions</HeaderMenuItem>
                   </HeaderNavigation>
                   <HeaderGlobalBar>
                     <HeaderGlobalAction
@@ -95,25 +87,24 @@ function App() {
           <Switch>
             <ProtectedRoutes path="/Home" component={Dashboard} IsAuthenticated={isAuthenticated} />
             <ProtectedRoutes path="/Reports" component={EmployeeStatusReport} IsAuthenticated={isAuthenticated} />
+            <ProtectedRoutes path="/Dimensions" component={Dimensions} IsAuthenticated={isAuthenticated} />
             <Route path="/Timesheet" component={TimesheetUpload} />
             <ProtectedRoutes
-              path="/EmployeeRegistration"
+              path="/EmployeeRegistration/:pfNumber?"
               component={EmployeeRegistrationForm}
               IsAuthenticated={isAuthenticated}
             />
             <Route path="/image/:filename" component={ShowTimesheet} />
             <ProtectedRoutes
               path="/EmployeeProfile/:pfNumber"
-              component={() => <Employeeprofile parentCallback={handleCallback} />}
+              component={Employeeprofile}
               IsAuthenticated={isAuthenticated}
             />
             <ProtectedRoutes
-              path="/AddEmployeeTracking"
+              path="/AddEmployeeTracking/:pfNumber"
               component={EmployeeTrackingForm}
               IsAuthenticated={isAuthenticated}
-            >
-              <EmployeeTrackingForm pfNumber={callBackValues?.pfNumber} edit={callBackValues?.edit} />
-            </ProtectedRoutes>
+            />
           </Switch>
         </>
       ) : (
