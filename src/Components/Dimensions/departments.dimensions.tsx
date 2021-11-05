@@ -56,6 +56,7 @@ const Department: React.FC = () => {
     addDepartment(values).then((resp) => {
       if (resp.status === 200) {
         setDimensionCreated(true);
+        helpers.resetForm({});
         console.log('success');
       } else {
         console.log('fail');

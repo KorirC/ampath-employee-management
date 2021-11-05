@@ -49,7 +49,6 @@ const Program: React.FC = () => {
       }),
     ]);
   }, []);
-  console.log(budgets);
 
   const onFormSubmit = (values: programInputProps, helpers: FormikHelpers<programInputProps>) => {
     console.log(values);
@@ -58,6 +57,7 @@ const Program: React.FC = () => {
       if (resp.status === 200) {
         setDimensionCreated(true);
         console.log('success');
+        helpers.resetForm({});
       } else {
         console.log('fail');
       }

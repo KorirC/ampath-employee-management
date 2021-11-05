@@ -57,6 +57,7 @@ const County: React.FC = () => {
       if (resp.status === 200) {
         setDimensionCreated(true);
         console.log('success');
+        helpers.resetForm({});
       } else {
         console.log('fail');
       }

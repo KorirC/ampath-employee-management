@@ -31,6 +31,7 @@ import Department from './departments.dimensions';
 import Site from './site.dimensions';
 import Program from './program.dimensions';
 import Project from './project.dimensions';
+import User from './user.dimensions';
 
 const Dimensions: React.FC = () => {
   const history = useHistory();
@@ -152,9 +153,6 @@ const Dimensions: React.FC = () => {
           <Tab id="budget" label="Budget">
             <Budgets />
           </Tab>
-          <Tab id="county" label="County">
-            <County />
-          </Tab>
           <Tab id="department" label="Department">
             <Department />
           </Tab>
@@ -166,6 +164,9 @@ const Dimensions: React.FC = () => {
           </Tab>
           <Tab id="project" label="Project">
             <Project />
+          </Tab>
+          <Tab id="user" label="User">
+            <User />
           </Tab>
         </Tabs>
       </Grid>
