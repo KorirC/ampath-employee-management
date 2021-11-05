@@ -23,8 +23,10 @@ import {
 import { Employee, getAllEmployees } from './employee.resource';
 import dayjs from 'dayjs';
 import { exportPDF } from './exportPDF';
+import styles from './employeeList.module.scss';
 import { Download16 as Download } from '@carbon/icons-react';
 import { CSVLink } from 'react-csv';
+import { calculate_age } from '../../../globals/calculateAge';
 
 const EmployeeList: React.FC = () => {
   const history = useHistory();
@@ -37,11 +39,13 @@ const EmployeeList: React.FC = () => {
     () => [
       { key: 'pfNumber', header: 'PF Number' },
       { key: 'name', header: 'Name' },
+      { key: 'age', header: 'Age' },
       { key: 'telephone', header: 'Phone Number' },
       { key: 'email', header: 'Email' },
       { key: 'kraPin', header: 'KRA Pin' },
       { key: 'nssf', header: 'NSSF' },
       { key: 'nhif', header: 'NHIF' },
+      { key: 'employeeStatus', header: 'Contract Status' },
     ],
     [],
   );
@@ -50,6 +54,7 @@ const EmployeeList: React.FC = () => {
     () => [
       { key: 'pfNumber', label: 'PF' },
       { key: 'name', label: 'Name' },
+      { key: 'age', label: 'Age' },
       { key: 'telephone', label: 'Phone No' },
       { key: 'email', label: 'Email' },
       { key: 'kraPin', label: 'KRA Pin' },
@@ -76,13 +81,14 @@ const EmployeeList: React.FC = () => {
           name: `${employee.firstName} ${employee.middleName} ${employee.lastName}`,
           idNumber: employee.idNumber,
           dob: dayjs(employee.dob).format('YYYY-MM-DD'),
-          age: employee.age,
+          age: calculate_age(employee.dob),
           telephone: employee.telephone,
           email: employee.email,
           gender: employee.gender,
           kraPin: employee.kraPin,
           nssf: employee.nssf,
           nhif: employee.nhif,
+          employeeStatus: employee.employeeStatus,
           pfNumber: employee.pfNumber,
           salutation: employee.salutation,
         };
@@ -123,9 +129,10 @@ const EmployeeList: React.FC = () => {
   };
   return (
     <>
+      <div className={styles.box}></div>Yet to retire
       {employees.length > 0 ? (
         <>
-          <DataTable rows={rows} headers={tableHeaders} useZebraStyles>
+          <DataTable rows={rows} headers={tableHeaders}>
             {({
               rows,
               headers,
@@ -137,7 +144,7 @@ const EmployeeList: React.FC = () => {
               getHeaderProps: any;
               getTableProps: any;
             }) => (
-              <TableContainer title="Employees List" style={{ marginTop: '10rem' }}>
+              <TableContainer title="Employees List">
                 <TableToolbar>
                   <TableToolbarContent>
                     <TableToolbarSearch persistent={true} onChange={handleSearch} />
@@ -177,6 +184,9 @@ const EmployeeList: React.FC = () => {
                         onClick={() => handleRowClick(row.cells[0].value)}
                         title="Click to view profile"
                         style={{ cursor: 'pointer' }}
+                        className={`${
+                          row.cells[2].value >= 55 && row.cells[8].value === 'Active' ? styles.retire : styles.normal
+                        }`}
                       >
                         {row.cells.map((cell: any) => (
                           <TableCell key={cell.id}>{cell.value}</TableCell>
