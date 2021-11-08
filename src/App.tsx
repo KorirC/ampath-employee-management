@@ -105,6 +105,7 @@ function App() {
               component={EmployeeTrackingForm}
               IsAuthenticated={isAuthenticated}
             />
+            <ProtectedRoutes path="/RegisterUser" component={Register} IsAuthenticated={isAuthenticated} />
           </Switch>
         </>
       ) : (
@@ -112,7 +113,6 @@ function App() {
           <Route exact path="/">
             <Login setIsAuthenticated={setIsAuthenticated} />
           </Route>
-          <Route path="/RegisterUser" component={Register}></Route>
         </Switch>
       )}
     </>
