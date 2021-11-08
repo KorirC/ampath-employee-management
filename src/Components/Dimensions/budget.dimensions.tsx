@@ -14,18 +14,12 @@ const Budgets: React.FC = () => {
   const [counties, setCounties] = React.useState([]);
   const [budgets, setBudgets] = React.useState([]);
   const [open, setOpen] = useState(true);
+  const [errorCode, setErrorCode] = useState('');
   const [dimensionCreated, setDimensionCreated] = useState<boolean>(false);
   const [selectedValues, setSelectedValues] = React.useState({
     budget: '',
     county: '',
   });
-
-  // const handleChange = (e: any) => {
-  //   setSelectedValues((current) => ({
-  //     ...current,
-  //     [e.target.id]: e.target.value,
-  //   }));
-  // };
 
   useMemo(async () => {
     await Promise.all([
@@ -57,9 +51,11 @@ const Budgets: React.FC = () => {
       if (resp.status === 200) {
         setDimensionCreated(true);
         helpers.resetForm({});
+        setErrorCode('');
         console.log('success');
       } else {
         console.log('fail');
+        setErrorCode('MFL Code already exists');
       }
     });
   };
@@ -67,6 +63,9 @@ const Budgets: React.FC = () => {
   return (
     <>
       {dimensionCreated && <ToastNotification title="Success!" timeout={5000} subtitle="Budget Added" kind="success" />}
+      {errorCode && (
+        <ToastNotification title="Error" timeout={5000} subtitle="Budget MFL Code In Use,Try Again" kind="warning" />
+      )}
       <Formik validationSchema={budgetSchema} initialValues={budgetValues} onSubmit={onFormSubmit}>
         {({ handleChange, setFieldValue, handleBlur, handleSubmit, values, touched, errors }) => (
           <Form onSubmit={handleSubmit}>
