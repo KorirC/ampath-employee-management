@@ -101,9 +101,6 @@ export const Register: React.FC = () => {
                     >
                       Create New User
                     </Button>
-                    <Link className={styles.link} onClick={handleOnClick}>
-                      Back to Login
-                    </Link>
                   </div>
                 </div>
               </div>

@@ -110,8 +110,11 @@ const Employeeprofile: React.FC = () => {
     });
   };
 
-  const handleClick = () => {
+  const goToEmployeeTracking = () => {
     history.push(`/AddEmployeeTracking/${pfNumber}`, history.location.pathname);
+  };
+  const goToEmployeeRegistration = () => {
+    history.push(`/EmployeeRegistration/${pf}`);
   };
   const getRowItems = (rows: Array<DataTableRow>) => {
     return rows.slice(firstRowIndex, firstRowIndex + currentPageSize).map((row: any) => ({ ...row }));
@@ -174,14 +177,14 @@ const Employeeprofile: React.FC = () => {
               <p>Project: {employeeDetails?.Project}</p> <p>Department: {employeeDetails?.Department}</p>{' '}
               <p>Program: {employeeDetails?.ProgramArea}</p> <p>Site: {employeeDetails?.Site}</p>
             </div>
-            <p>
-              <Button type="submit" className={styles.button} kind="primary" onClick={handleClick}>
+            <>
+              <Button type="button" className={styles.button} kind="primary" onClick={goToEmployeeTracking}>
                 Update tracking details
               </Button>
-            </p>
-            <p className={styles.updateBtn}>
-              <Link to={`/EmployeeRegistration/${pf}`}> Update employee details</Link>
-            </p>
+              <Button type="button" className={styles.button} kind="secondary" onClick={goToEmployeeRegistration}>
+                Update employee details
+              </Button>
+            </>
           </Column>
         </Row>
       </div>

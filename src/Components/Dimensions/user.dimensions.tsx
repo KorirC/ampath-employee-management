@@ -32,10 +32,11 @@ import { getBudgets, getCounties } from '../../commonResources/common.resource';
 import { useEffect, useMemo, useState } from 'react';
 import styles from './dimensions.module.scss';
 import { getUser, updateRole } from './dimensions.resource';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Formik, Form, FormikHelpers } from 'formik';
 import { userInputProps, userValues } from './dimensions.types';
 import { userSchema } from './dimensions.validation';
+import { Add24 } from '@carbon/icons-react';
 
 const User: React.FC = () => {
   const [users, setUsers] = React.useState<Array<userInputProps>>([]);
@@ -45,6 +46,8 @@ const User: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [textuser, setTextuser] = useState('');
   const [role, setRole] = useState('');
+  const [error, setError] = useState<boolean>(false);
+  const history = useHistory();
 
   const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
@@ -53,6 +56,21 @@ const User: React.FC = () => {
     ],
     [],
   );
+
+  const roleOptions: Array<{ id: string; text: string }> = [
+    {
+      id: 'user',
+      text: 'User',
+    },
+    {
+      id: 'admin',
+      text: 'Admin',
+    },
+    {
+      id: 'hrManager',
+      text: 'HR-Manager',
+    },
+  ];
 
   const handleSearch = (e: any) => {
     e.preventDefault();
@@ -87,19 +105,29 @@ const User: React.FC = () => {
   });
 
   const handleRole = () => {
-    let data = JSON.stringify({
-      userName: textuser,
-      role: role,
-    });
+    let data;
+    role
+      ? (data = JSON.stringify({
+          userName: textuser,
+          role: role,
+        }))
+      : setError(true);
 
-    updateRole(data).then((response) => setOpen(false));
-    fetchUsers();
+    updateRole(data).then((response) => {
+      if (response) {
+        setOpen(false);
+        fetchUsers();
+      }
+    });
   };
 
   const handleRowClick = (value) => {
-    console.log(value);
     setOpen(true);
     setTextuser(value);
+  };
+
+  const handleChange = (e) => {
+    e.target.value ? [setRole(e.target.value), setError(false)] : [setRole(e.target.value), setError(true)];
   };
 
   const getRowItems = (rows: Array<DataTableRow>) => {
@@ -127,6 +155,14 @@ const User: React.FC = () => {
                 <TableToolbar>
                   <TableToolbarContent>
                     <TableToolbarSearch persistent={true} onChange={handleSearch} />
+                    <Button
+                      type="button"
+                      kind="ghost"
+                      className={styles.addUserBtn}
+                      onClick={() => history.push('/RegisterUser')}
+                    >
+                      Add <Add24 aria-label="Add user" />
+                    </Button>
                   </TableToolbarContent>
                 </TableToolbar>
                 <Table {...getTableProps()}>
@@ -182,14 +218,17 @@ const User: React.FC = () => {
         preventCloseOnClickOutside
         onRequestClose={() => {
           setOpen(false);
+          setRole('');
         }}
       >
         <TextInput value={textuser} id="text-input-1" labelText="Current User" />
-        <Select id="role" defaultValue="Choose Below" labelText="Role" onChange={(e) => setRole(e.target.value)}>
-          <SelectItem value="User" text="User" />
-
-          <SelectItem value="Admin" text="Admin" />
+        <Select id="role" value={role} labelText="Role" onChange={handleChange}>
+          <SelectItem value="" text="--Select role--" />
+          {roleOptions.map((value) => (
+            <SelectItem id={value.id} value={value.text} text={value.text} />
+          ))}
         </Select>
+        {error && <p style={{ color: 'tomato' }}>Select valid user role</p>}
         <Button kind="primary" onClick={handleRole} className={styles.btn}>
           Update Role
         </Button>
