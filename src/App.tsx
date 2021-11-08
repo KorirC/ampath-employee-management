@@ -26,9 +26,10 @@ import TimesheetUpload from './Components/Timesheets/timesheetUpload';
 import Dimensions from './Components/Dimensions/dimensions';
 
 function App() {
-  const [open, setOpen] = useState<boolean>(false);
   const [sidebar, setSidebar] = useState<boolean>(true);
   const history = useHistory();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState(localStorage.getItem('role'));
 
   const onClickSideNavClosed = () => {
     if (sidebar == true) {
@@ -37,13 +38,14 @@ function App() {
       setSidebar(true);
     }
   };
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     {
       token !== null ? setIsAuthenticated(true) : isAuthenticated;
     }
   }, []);
+
   return (
     <>
       {isAuthenticated ? (
@@ -62,10 +64,14 @@ function App() {
                     PLUS
                   </HeaderName>
                   <HeaderNavigation aria-label="AMPATH">
-                    <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
-                    <HeaderMenuItem href="/Timesheet">Timesheets</HeaderMenuItem>
-                    <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
-                    <HeaderMenuItem href="/Dimensions">Dimensions</HeaderMenuItem>
+                    <>
+                      <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
+                      <HeaderMenuItem href="/Timesheet">Timesheets</HeaderMenuItem>
+                      {(role === 'hrManager' || role === 'Admin') && (
+                        <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
+                      )}
+                      {role === 'Admin' && <HeaderMenuItem href="/Dimensions">Dimensions</HeaderMenuItem>}
+                    </>
                   </HeaderNavigation>
                   <HeaderGlobalBar>
                     <HeaderGlobalAction
@@ -86,8 +92,12 @@ function App() {
           />
           <Switch>
             <ProtectedRoutes path="/Home" component={Dashboard} IsAuthenticated={isAuthenticated} />
-            <ProtectedRoutes path="/Reports" component={EmployeeStatusReport} IsAuthenticated={isAuthenticated} />
-            <ProtectedRoutes path="/Dimensions" component={Dimensions} IsAuthenticated={isAuthenticated} />
+            {(role === 'Admin' || role === 'hrManager') && (
+              <ProtectedRoutes path="/Reports" component={EmployeeStatusReport} IsAuthenticated={isAuthenticated} />
+            )}
+            {role === 'Admin' && (
+              <ProtectedRoutes path="/Dimensions" component={Dimensions} IsAuthenticated={isAuthenticated} />
+            )}
             <Route path="/Timesheet" component={TimesheetUpload} />
             <ProtectedRoutes
               path="/EmployeeRegistration/:pfNumber?"
@@ -110,7 +120,7 @@ function App() {
       ) : (
         <Switch>
           <Route exact path="/">
-            <Login setIsAuthenticated={setIsAuthenticated} />
+            <Login setIsAuthenticated={setIsAuthenticated} setRole={setRole} />
           </Route>
           <Route path="/RegisterUser" component={Register}></Route>
         </Switch>
