@@ -12,9 +12,10 @@ import ampath from '../../images/ampath.png';
 
 interface props {
   setIsAuthenticated: any;
+  setRole: any;
 }
 
-export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
+export const Login: React.FC<props> = ({ setIsAuthenticated, setRole }) => {
   const [error, setError] = useState('');
   const history = useHistory();
 
@@ -25,6 +26,8 @@ export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
       if (resp.data.token) {
         setIsAuthenticated(true);
         localStorage.setItem('token', resp.data.token);
+        localStorage.setItem('role', resp.data.results.role);
+        setRole(resp.data.results.role);
         history.push('/Home');
       } else {
         console.log('error');
