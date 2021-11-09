@@ -4,6 +4,7 @@
     margin-left: 250px;
     padding: 20px;
     border-left: 1px solid rgb(21, 109, 131);
+    width: 50%;
 }
 
 .form .header{
@@ -21,9 +22,12 @@
     font-size: small;
 }
 
+h3{
+    margin-left: 1rem;
+}
+
 .toast {
     position: fixed;
-    z-index: 4;
     right: 0;
-    top: 0;
+    top: 2em;
 }

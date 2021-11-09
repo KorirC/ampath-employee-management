@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route, useHistory, Switch } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Route, useHistory, Switch } from 'react-router-dom';
 import styles from './App.module.css';
-import NavigationBar from './Components/Navigation/NavigationBar';
 import { Login } from './Components/Login/login';
 import ProtectedRoutes from './Components/ProtectedRoutes/ProtectedRoutes';
 import { Register } from './Components/Register/register';
@@ -17,7 +15,6 @@ import {
   HeaderMenuItem,
   HeaderGlobalBar,
   HeaderGlobalAction,
-  Modal,
 } from 'carbon-components-react';
 import { Dashboard } from './Components/Dashboard/dashboard';
 import Employeeprofile from './Components/Employee/Profile/employee-profile';
@@ -25,22 +22,19 @@ import { ShowTimesheet } from './Components/Employee/Profile/timesheetImage';
 import { EmployeeRegistrationForm } from './Components/Employee/Registration/employee-registration.component';
 import { EmployeeTrackingForm } from './Components/Employee/Tracking/employee-tracking.component';
 import { EmployeeStatusReport } from './Components/Reports/reports';
-import { EmployeeTrackingInputProps } from './Components/Employee/Tracking/employee-tracking-types';
 import TimesheetUpload from './Components/Timesheets/timesheetUpload';
-interface CallBackValuesProps {
-  pfNumber: number;
-  edit?: EmployeeTrackingInputProps;
+import Dimensions from './Components/Dimensions/dimensions';
+
+enum roles {
+  ADMIN = 'Admin',
+  USER = 'User',
+  HRMANAGER = 'hrManager',
 }
-
 function App() {
-  const [open, setOpen] = useState<boolean>(false);
   const [sidebar, setSidebar] = useState<boolean>(true);
-  const [callBackValues, setCallBackValues] = useState<CallBackValuesProps>();
   const history = useHistory();
-
-  const handleCallback = (data) => {
-    setCallBackValues(data);
-  };
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState(sessionStorage.getItem('role'));
 
   const onClickSideNavClosed = () => {
     if (sidebar == true) {
@@ -49,24 +43,17 @@ function App() {
       setSidebar(true);
     }
   };
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     {
-      token !== null ? setIsAuthenticated(true) : setIsAuthenticated(false);
+      token !== null ? setIsAuthenticated(true) : isAuthenticated;
     }
-  });
+  }, []);
 
   return (
     <>
-      {!isAuthenticated ? (
-        <>
-          <Route exact path="/">
-            <Login setIsAuthenticated={setIsAuthenticated} />
-          </Route>
-          <Route path="/RegisterUser" component={Register}></Route>
-        </>
-      ) : (
+      {isAuthenticated ? (
         <>
           <HeaderContainer
             render={({ isSideNavExpanded, onClickSideNavExpand }) => (
@@ -82,16 +69,21 @@ function App() {
                     PLUS
                   </HeaderName>
                   <HeaderNavigation aria-label="AMPATH">
-                    <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
-                    <HeaderMenuItem onClick={() => setOpen(true)}>Timesheets</HeaderMenuItem>
-                    <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
+                    <>
+                      <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
+                      <HeaderMenuItem href="/Timesheet">Timesheets</HeaderMenuItem>
+                      {(role === roles.HRMANAGER || role === roles.ADMIN) && (
+                        <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
+                      )}
+                      {role === roles.ADMIN && <HeaderMenuItem href="/Dimensions">Dimensions</HeaderMenuItem>}
+                    </>
                   </HeaderNavigation>
                   <HeaderGlobalBar>
                     <HeaderGlobalAction
                       id="logout"
                       aria-label="Log Out"
                       onClick={() => {
-                        localStorage.clear();
+                        sessionStorage.clear();
                         setIsAuthenticated(false);
                         history.push('/');
                       }}
@@ -103,42 +95,40 @@ function App() {
               </>
             )}
           />
-          <div>
-            <Switch>
-              <ProtectedRoutes path="/Home" component={Dashboard} IsAuthenticated={isAuthenticated} />
+          <Switch>
+            <ProtectedRoutes path="/Home" component={Dashboard} IsAuthenticated={isAuthenticated} />
+            {(role === roles.ADMIN || role === roles.HRMANAGER) && (
               <ProtectedRoutes path="/Reports" component={EmployeeStatusReport} IsAuthenticated={isAuthenticated} />
-              <ProtectedRoutes
-                path="/EmployeeRegistration"
-                component={EmployeeRegistrationForm}
-                IsAuthenticated={isAuthenticated}
-              />
-              <Route path="/login" component={Login}></Route>
-              <Route path="/image/:filename" component={ShowTimesheet} />
-              <ProtectedRoutes
-                path="/EmployeeProfile/:pfNumber"
-                component={() => <Employeeprofile parentCallback={handleCallback} />}
-                IsAuthenticated={isAuthenticated}
-              />
-              <ProtectedRoutes
-                path="/AddEmployeeTracking"
-                component={EmployeeTrackingForm}
-                IsAuthenticated={isAuthenticated}
-              >
-                <EmployeeTrackingForm pfNumber={callBackValues?.pfNumber} edit={callBackValues?.edit} />
-              </ProtectedRoutes>
-            </Switch>
-          </div>
-          <Modal
-            open={open}
-            preventCloseOnClickOutside
-            passiveModal
-            onRequestClose={() => {
-              setOpen(false);
-            }}
-          >
-            <TimesheetUpload />
-          </Modal>
+            )}
+            {role === roles.ADMIN && (
+              <ProtectedRoutes path="/Dimensions" component={Dimensions} IsAuthenticated={isAuthenticated} />
+            )}
+            <Route path="/Timesheet" component={TimesheetUpload} />
+            <ProtectedRoutes
+              path="/EmployeeRegistration/:pfNumber?"
+              component={EmployeeRegistrationForm}
+              IsAuthenticated={isAuthenticated}
+            />
+            <Route path="/image/:filename" component={ShowTimesheet} />
+            <ProtectedRoutes
+              path="/EmployeeProfile/:pfNumber"
+              component={Employeeprofile}
+              IsAuthenticated={isAuthenticated}
+            />
+            <ProtectedRoutes
+              path="/AddEmployeeTracking/:pfNumber"
+              component={EmployeeTrackingForm}
+              IsAuthenticated={isAuthenticated}
+            />
+            <ProtectedRoutes path="/RegisterUser" component={Register} IsAuthenticated={isAuthenticated} />
+          </Switch>
         </>
+      ) : (
+        <Switch>
+          <Route exact path="/">
+            <Login setIsAuthenticated={setIsAuthenticated} setRole={setRole} />
+          </Route>
+        </Switch>
       )}
     </>
   );

@@ -19,6 +19,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableToolbar,
+  TableToolbarAction,
+  TableToolbarContent,
+  TableToolbarMenu,
 } from 'carbon-components-react';
 import {
   getBudgets,
@@ -30,6 +34,8 @@ import {
   getSites,
   trackEmployees,
 } from '../../commonResources/common.resource';
+import { Download16 as Download } from '@carbon/icons-react';
+import { CSVLink } from 'react-csv';
 import { exportPDF } from './exportPDF';
 
 export const EmployeeStatusReport: React.FC = () => {
@@ -69,6 +75,19 @@ export const EmployeeStatusReport: React.FC = () => {
       { key: 'site', header: 'Site' },
       { key: 'county', header: 'County' },
       { key: 'program', header: 'Program Area' },
+    ],
+    [],
+  );
+  const csvHeaders: Array<any> = useMemo(
+    () => [
+      { key: 'pfNumber', label: 'PF Number' },
+      { key: 'name', label: 'Name' },
+      { key: 'status', label: 'Contract Status' },
+      { key: 'department', label: 'Department' },
+      { key: 'project', label: 'Project' },
+      { key: 'site', label: 'Site' },
+      { key: 'county', label: 'County' },
+      { key: 'program', label: 'Program Area' },
     ],
     [],
   );
@@ -179,54 +198,49 @@ export const EmployeeStatusReport: React.FC = () => {
             <FormLabel>
               <span>Filter By</span>
             </FormLabel>
-            <Select
-              id="contractStatus"
-              labelText="Contract Status: "
-              defaultValue="placeholder-item"
-              onChange={handleChange}
-            >
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="contractStatus" labelText="Contract Status: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               <SelectItem text="Active" value="Active" />
               <SelectItem text="InActive" value="InActive" />
             </Select>
 
-            <Select id="department" labelText="Department: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="department" labelText="Department: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {departments.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
-            <Select id="project" labelText="Project: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="project" labelText="Project: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {projects.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
-            <Select id="site" labelText="Site: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="site" labelText="Site: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {sites.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
-            <Select id="budget" labelText="Budget: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="budget" labelText="Budget: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {budgets.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
-            <Select id="county" labelText="County: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="county" labelText="County: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {counties.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
-            <Select id="programArea" labelText="Program Area: " defaultValue="placeholder-item" onChange={handleChange}>
-              <SelectItem disabled hidden value="placeholder-item" text=" " />
+            <Select id="programArea" labelText="Program Area: " defaultValue="" onChange={handleChange}>
+              <SelectItem value="" text="All" />
               {programs.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
@@ -242,16 +256,34 @@ export const EmployeeStatusReport: React.FC = () => {
                 rows,
                 headers,
                 getHeaderProps,
-                getRowProps,
                 getTableProps,
               }: {
                 rows: any;
                 headers: any;
-                getRowProps: any;
                 getHeaderProps: any;
                 getTableProps: any;
               }) => (
                 <TableContainer title="Employees Report" style={{ marginTop: '3rem' }}>
+                  <TableToolbar>
+                    <TableToolbarContent>
+                      <TableToolbarMenu iconDescription="Download" renderIcon={Download}>
+                        <TableToolbarAction onClick={() => exportPDF(report)}>
+                          <a href="#">Download as pdf</a>{' '}
+                        </TableToolbarAction>
+                        <TableToolbarAction>
+                          <CSVLink
+                            data={report}
+                            headers={csvHeaders}
+                            filename={'Employee-Status-Report.csv'}
+                            className="btn btn-primary"
+                            target="_blank"
+                          >
+                            Download as csv
+                          </CSVLink>
+                        </TableToolbarAction>
+                      </TableToolbarMenu>
+                    </TableToolbarContent>
+                  </TableToolbar>
                   <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
@@ -273,9 +305,11 @@ export const EmployeeStatusReport: React.FC = () => {
                         ))
                       ) : (
                         <TableRow>
-                          <TableCell style={{ columnSpan: 'all' }}>
-                            <h5>No records found</h5>
-                          </TableCell>
+                          {headers.map((header: any) => (
+                            <TableHeader key={header.key} {...getHeaderProps({ header })}>
+                              {header.header}
+                            </TableHeader>
+                          ))}
                         </TableRow>
                       )}
                     </TableBody>
@@ -298,9 +332,6 @@ export const EmployeeStatusReport: React.FC = () => {
                 </TableContainer>
               )}
             </DataTable>
-            <Button kind="secondary" onClick={() => exportPDF(report)}>
-              Download
-            </Button>
           </Column>
         </Row>
       </Grid>

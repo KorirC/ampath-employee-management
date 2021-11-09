@@ -1,5 +1,5 @@
 const url = process.env.REACT_APP_URL;
-const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token');
 export const getAllEmployees = async () => {
   return await fetch(url + `/employee`, {
     headers: {

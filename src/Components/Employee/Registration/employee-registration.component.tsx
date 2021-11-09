@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { Formik, Form, FormikHelpers, ErrorMessage } from 'formik';
+import React, { useEffect, useRef, useState } from 'react';
+import { FormikHelpers, useFormik } from 'formik';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -16,43 +16,111 @@ import {
   SideNavDivider,
   SideNavLink,
   Row,
+  Form,
 } from 'carbon-components-react';
 import styles from './employee-registration.module.scss';
 import { formValues } from './employee-registration-types';
 import { validationSchema } from './validation/employee-registration-validation';
 import { EmployeeRegistrationFormProps } from './employee-registration-types';
-import { saveEmployeeInformation } from './employee-registration.resource';
-import { EmployeeTrackingForm } from '../Tracking/employee-tracking.component';
+import {
+  getEmployeeInformation,
+  saveEmployeeInformation,
+  updateEmployeeInformation,
+} from './employee-registration.resource';
+import { useHistory, useParams } from 'react-router-dom';
 
 export const EmployeeRegistrationForm: React.FC = () => {
   const [formIsComplete, setFormIsComplete] = useState<boolean>(false);
   const [errorInForm, setErrorInForm] = useState<boolean>(false);
   const [pfNumber, setPfNumber] = useState<number>();
+  const [update, setUpdate] = useState<boolean>(false);
+  const [edited, setEdited] = useState<boolean>(false);
+  const [editValues, setEditValues] = useState<Object>();
+  const history = useHistory();
+  const { pfNumber: pf } = useParams<{ pfNumber: string }>();
+
   const onFormSubmit = (
     values: EmployeeRegistrationFormProps,
     helpers: FormikHelpers<EmployeeRegistrationFormProps>,
   ) => {
-    helpers.setSubmitting(true);
-    saveEmployeeInformation(values).then(
-      (response) => {
-        if (response.status === 200) {
-          setFormIsComplete(true);
-          setPfNumber(Number(values.pfNumber));
-        }
-      },
-      (error) => {
-        setErrorInForm(true);
-        setTimeout(() => setErrorInForm(false), 3000);
-        helpers.setSubmitting(false);
-      },
-    );
+    update
+      ? updateEmployeeInformation(values).then(
+          (response) => {
+            if (response.status === 200) {
+              setFormIsComplete(true);
+              setTimeout(() => history.push(`/EmployeeProfile/${pf}`), 1000);
+            } else {
+              setErrorInForm(true);
+            }
+          },
+          (error) => {
+            setErrorInForm(true);
+          },
+        )
+      : saveEmployeeInformation(values).then(
+          (response) => {
+            if (response.status === 200) {
+              setFormIsComplete(true);
+              setPfNumber(Number(values.pfNumber));
+            }
+          },
+          (error) => {
+            setErrorInForm(true);
+            setTimeout(() => setErrorInForm(false), 1000);
+          },
+        );
   };
 
-  const handleCallback = (data) => {
-    if (data.formSuccess) {
-      setTimeout(() => setFormIsComplete(false), 2000);
-    }
-  };
+  const formik = useFormik({
+    initialValues: formValues,
+    onSubmit: onFormSubmit,
+    validationSchema: validationSchema,
+  });
+
+  useEffect(() => {
+    pf &&
+      getEmployeeInformation(pf).then((response) => {
+        if (response) {
+          response.map((resp) => {
+            Object.entries(resp).map((data) => {
+              formik.setFieldValue(data[0], data[1]);
+              setUpdate(true);
+              setEditValues(resp);
+            });
+          });
+        }
+      });
+  }, [pf]);
+
+  useEffect(() => {
+    let entries: Array<{ name: string; sameValue: boolean }> = [];
+    editValues &&
+      Object.entries(formik.values).map(([key, value]) => {
+        Object.entries({ ...editValues })
+          .filter(([k]) => k === key)
+          .map((v) => {
+            const insertedValue = key === 'dob' ? dayjs(`${value}`).format('YYYY-MM-DD') : value;
+            const existingValue = v[0] === 'dob' ? dayjs(`${v[1]}`).format('YYYY-MM-DD') : v[1];
+            if (existingValue != insertedValue) {
+              entries.push({ name: v[0], sameValue: false });
+            } else {
+              entries.push({ name: v[0], sameValue: true });
+            }
+          });
+        const obj = entries.filter((k) => k.sameValue === false);
+        if (obj.length > 0) {
+          setEdited(false);
+        } else {
+          setEdited(true);
+        }
+      });
+  }, [formik.values, editValues]);
+
+  useEffect(() => {
+    formIsComplete &&
+      pfNumber &&
+      setTimeout(() => history.push(`/AddEmployeeTracking/${pfNumber}`, history.location.pathname), 1000);
+  }, [formIsComplete, pfNumber]);
 
   const basicRef = useRef<null | HTMLHeadingElement>(null);
   const contactRef = useRef<null | HTMLHeadingElement>(null);
@@ -72,9 +140,8 @@ export const EmployeeRegistrationForm: React.FC = () => {
     <>
       <SideNav isFixedNav expanded={true} aria-label="SideNav">
         <SideNavItems>
-          <SideNavDivider />
-          <br />
           <h3>Create Employee</h3>
+          <SideNavDivider />
           <SideNavLink onClick={handleBasicRef}>Basic info</SideNavLink>
           <SideNavDivider />
           <SideNavLink onClick={handleContactRef}>Contact details</SideNavLink>
@@ -83,238 +150,209 @@ export const EmployeeRegistrationForm: React.FC = () => {
           <SideNavDivider />
         </SideNavItems>
       </SideNav>
-
-      {!formIsComplete && (
-        <Formik validationSchema={validationSchema} initialValues={formValues} onSubmit={onFormSubmit}>
-          {({ handleChange, setFieldValue, handleBlur, values, touched, errors, isSubmitting }) => (
-            <Grid>
-              <Form className={styles.form}>
+      <div>
+        <Grid>
+          <Row>
+            <Column>
+              <Form className={styles.form} onSubmit={formik.handleSubmit}>
                 <h4 ref={basicRef} className={styles.header}>
                   1. Basic info
                 </h4>
-                <Row>
-                  <Column>
-                    <RadioButtonGroup
-                      name="salutation"
-                      legendText="Salutation"
-                      onChange={(event) => {
-                        setFieldValue('salutation', event);
-                      }}
-                    >
-                      <RadioButton id="mr" key="mr" labelText="Mr" value="Mr" />
-                      <RadioButton id="mrs" key="mrs" labelText="Mrs" value="Mrs" />
-                      <RadioButton id="miss" key="miss" labelText="Miss" value="Miss" />
-                    </RadioButtonGroup>
-                    <ErrorMessage
-                      name="salutation"
-                      render={(message) => <span className={styles.errorMsg}>{message}</span>}
-                    />
-                  </Column>
-                </Row>
-                <Row>
-                  <Column>
-                    <TextInput
-                      id="firstName"
-                      name="firstName"
-                      type="text"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      labelText="First name"
-                      value={values.firstName}
-                      invalid={!!(touched.firstName && errors.firstName)}
-                      invalidText={errors.firstName}
-                    />
-                  </Column>
-                  <Column>
-                    <TextInput
-                      id="middleName"
-                      name="middleName"
-                      type="text"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      labelText="Middle name"
-                      value={values.middleName}
-                      invalid={!!(touched.middleName && errors.middleName)}
-                      invalidText={errors.middleName}
-                    />
-                  </Column>
-                  <Column>
-                    <TextInput
-                      id="lastName"
-                      name="lastName"
-                      type="text"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      labelText="Last name"
-                      value={values.lastName}
-                      invalid={!!(touched.lastName && errors.lastName)}
-                      invalidText={errors.lastName}
-                    />
-                  </Column>
-                </Row>
-                <Row>
-                  <Column>
-                    <TextInput
-                      id="idNumber"
-                      name="idNumber"
-                      type="text"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      labelText="Id number"
-                      value={values.idNumber}
-                      invalid={!!(touched.idNumber && errors.idNumber)}
-                      invalidText={errors.idNumber}
-                    />
-                  </Column>
-                </Row>
-                <Row>
-                  <Column>
-                    <DatePicker
-                      datePickerType="single"
-                      onChange={([event]) => {
-                        setFieldValue('dob', dayjs(event).format('YYYY-MM-DD'));
-                      }}
-                      onBlur={handleBlur}
-                      maxDate={dayjs(new Date()).format('MM/DD/YYYY')}
-                    >
-                      <DatePickerInput
-                        id="dob"
-                        name="dob"
-                        type="date"
-                        labelText="Date of birth"
-                        placeholder="mm/dd/yyyy"
-                        invalid={!!(touched.dob && errors.dob)}
-                        invalidText={errors.dob}
-                      />
-                    </DatePicker>
-                  </Column>
-                  <Column>
-                    <RadioButtonGroup
-                      name="gender"
-                      legendText="Choose gender"
-                      onChange={(event) => {
-                        setFieldValue('gender', event);
-                      }}
-                    >
-                      <RadioButton id="male" key="male" labelText="Male" value="Male" />
-                      <RadioButton id="female" key="female" labelText="Female" value="Female" />
-                    </RadioButtonGroup>
-                    <ErrorMessage
-                      name="gender"
-                      render={(message) => <span className={styles.errorMsg}>{message}</span>}
-                    />
-                  </Column>
-                </Row>
+                <RadioButtonGroup
+                  name="salutation"
+                  legendText="Salutation"
+                  onChange={(event) => {
+                    formik.setFieldValue('salutation', event);
+                  }}
+                  valueSelected={formik.values.salutation}
+                >
+                  <RadioButton id="mr" key="mr" labelText="Mr" value="Mr" />
+                  <RadioButton id="mrs" key="mrs" labelText="Mrs" value="Mrs" />
+                  <RadioButton id="miss" key="miss" labelText="Miss" value="Miss" />
+                </RadioButtonGroup>
+                {formik.touched.salutation && formik.errors.salutation && (
+                  <span className={styles.errorMsg}>{formik.errors.salutation}</span>
+                )}
+
+                <TextInput
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  labelText="First name"
+                  value={formik.values.firstName}
+                  invalid={!!(formik.touched.firstName && formik.errors.firstName)}
+                  invalidText={formik.errors.firstName}
+                />
+                <TextInput
+                  id="middleName"
+                  name="middleName"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  labelText="Middle name"
+                  value={formik.values.middleName}
+                  invalid={!!(formik.touched.middleName && formik.errors.middleName)}
+                  invalidText={formik.errors.middleName}
+                />
+                <TextInput
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  labelText="Last name"
+                  value={formik.values.lastName}
+                  invalid={!!(formik.touched.lastName && formik.errors.lastName)}
+                  invalidText={formik.errors.lastName}
+                />
+
+                <TextInput
+                  id="idNumber"
+                  name="idNumber"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  labelText="Id number"
+                  value={formik.values.idNumber}
+                  invalid={!!(formik.touched.idNumber && formik.errors.idNumber)}
+                  invalidText={formik.errors.idNumber}
+                />
+
+                <DatePicker
+                  datePickerType="single"
+                  onChange={([event]) => {
+                    formik.setFieldValue('dob', dayjs(event).format('YYYY-MM-DD'));
+                  }}
+                  onBlur={formik.handleBlur}
+                  maxDate={dayjs(new Date()).format('MM/DD/YYYY')}
+                  value={dayjs(formik.values.dob).format('MM/DD/YYYY')}
+                >
+                  <DatePickerInput
+                    id="dob"
+                    name="dob"
+                    type="date"
+                    labelText="Date of birth"
+                    placeholder="mm/dd/yyyy"
+                    invalid={!!(formik.touched.dob && formik.errors.dob)}
+                    invalidText={formik.errors.dob}
+                  />
+                </DatePicker>
+                <RadioButtonGroup
+                  name="gender"
+                  legendText="Choose gender"
+                  onChange={(event) => {
+                    formik.setFieldValue('gender', event);
+                  }}
+                  valueSelected={formik.values.gender}
+                >
+                  <RadioButton id="male" key="male" labelText="Male" value="Male" />
+                  <RadioButton id="female" key="female" labelText="Female" value="Female" />
+                </RadioButtonGroup>
+                {formik.touched.gender && formik.errors.gender && (
+                  <span className={styles.errorMsg}>{formik.errors.gender}</span>
+                )}
+
                 <h4 ref={contactRef} className={styles.header}>
                   2. Contact details
                 </h4>
-                <Column>
-                  <TextInput
-                    id="telephone"
-                    name="telephone"
-                    type="text"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    labelText="Phone number"
-                    value={values.telephone}
-                    invalid={!!(touched.telephone && errors.telephone)}
-                    invalidText={errors.telephone}
-                  />
-                </Column>
-                <Column>
-                  <TextInput
-                    id="email"
-                    name="email"
-                    type="text"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    labelText="Email"
-                    value={values.email}
-                    invalid={!!(touched.email && errors.email)}
-                    invalidText={errors.email}
-                  />
-                </Column>
+                <TextInput
+                  id="telephone"
+                  name="telephone"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  labelText="Phone number"
+                  value={formik.values.telephone}
+                  invalid={!!(formik.touched.telephone && formik.errors.telephone)}
+                  invalidText={formik.errors.telephone}
+                />
+                <TextInput
+                  id="email"
+                  name="email"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  labelText="Email"
+                  value={formik.values.email}
+                  invalid={!!(formik.touched.email && formik.errors.email)}
+                  invalidText={formik.errors.email}
+                />
                 <h4 ref={employeeRef} className={styles.header}>
                   3. Employee details
                 </h4>
-                <Column>
-                  <TextInput
-                    id="pfNumber"
-                    name="pfNumber"
-                    type="text"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    labelText="PF number"
-                    value={values.pfNumber}
-                    invalid={!!(touched.pfNumber && errors.pfNumber)}
-                    invalidText={errors.pfNumber}
-                  />
-                </Column>
-                <Column>
-                  <TextInput
-                    id="kraPin"
-                    name="kraPin"
-                    type="text"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    labelText="KRA pin"
-                    value={values.kraPin}
-                    invalid={!!(touched.kraPin && errors.kraPin)}
-                    invalidText={errors.kraPin}
-                  />
-                </Column>
-                <Column>
-                  <TextInput
-                    id="nssf"
-                    name="nssf"
-                    type="text"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    labelText="NSSF number"
-                    value={values.nssf}
-                    invalid={!!(touched.nssf && errors.nssf)}
-                    invalidText={errors.nssf}
-                  />
-                </Column>
-                <Column>
-                  <TextInput
-                    id="nhif"
-                    name="nhif"
-                    type="text"
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    labelText="NHIF number"
-                    value={values.nhif}
-                    invalid={!!(touched.nhif && errors.nhif)}
-                    invalidText={errors.nhif}
-                  />
-                </Column>
-                <Column>
-                  <Button className={styles.submitBtn} type="submit">
-                    Save
-                  </Button>
-                </Column>
+                <TextInput
+                  id="pfNumber"
+                  name="pfNumber"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  labelText="PF number"
+                  value={formik.values.pfNumber}
+                  invalid={!!(formik.touched.pfNumber && formik.errors.pfNumber)}
+                  invalidText={formik.errors.pfNumber}
+                />
+                <TextInput
+                  id="kraPin"
+                  name="kraPin"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  labelText="KRA pin"
+                  value={formik.values.kraPin}
+                  invalid={!!(formik.touched.kraPin && formik.errors.kraPin)}
+                  invalidText={formik.errors.kraPin}
+                />
+                <TextInput
+                  id="nssf"
+                  name="nssf"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  labelText="NSSF number"
+                  value={formik.values.nssf}
+                  invalid={!!(formik.touched.nssf && formik.errors.nssf)}
+                  invalidText={formik.errors.nssf}
+                />
+                <TextInput
+                  id="nhif"
+                  name="nhif"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  labelText="NHIF number"
+                  value={formik.values.nhif}
+                  invalid={!!(formik.touched.nhif && formik.errors.nhif)}
+                  invalidText={formik.errors.nhif}
+                />
+                <Button className={styles.submitBtn} disabled={edited} type="submit">
+                  {update ? 'Update' : 'Save'}
+                </Button>
               </Form>
-            </Grid>
-          )}
-        </Formik>
-      )}
+            </Column>
+          </Row>
+        </Grid>
+      </div>
       {formIsComplete && (
         <>
           <ToastNotification
-            title="Data saved successfully"
-            timeout={3000}
+            title={update ? 'Data updated successfully' : 'Data saved successfully'}
+            timeout={1000}
             className={styles.toast}
-            subtitle="Employee registration data saved successfully"
+            subtitle={
+              update
+                ? 'Employee registration data updated successfully'
+                : 'Employee registration data saved successfully'
+            }
             kind="success"
           />
-          <EmployeeTrackingForm pfNumber={pfNumber} parentCallback={handleCallback} />
         </>
       )}
       {errorInForm && (
         <ToastNotification
           title="Error saving data"
-          timeout={3000}
+          timeout={1000}
           className={styles.toast}
           subtitle="Employee registration data not saved"
           kind="error"

@@ -9,9 +9,8 @@
 }
 
 .loginform {
-  margin: 5rem;
-  margin-left: auto;
-  margin-right: auto;
+  position: relative;
+  margin: 2rem auto;
   background-color: whitesmoke;
   font-weight: bold;
   border: 3px solid #f1f1f1;
@@ -19,12 +18,8 @@
   height: fit-content;
   border-radius: 1px;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-  position: relative;
   padding: 4rem;
-  font-size: 14px;
-  line-height: 24px;
-  text-align: justify;
-  text-justify: inter-word;
+  top: 8rem;
 }
 
 .checked {
@@ -33,14 +28,9 @@
 
 .logoutbutton {
   margin-top: 2rem;
-  margin-right: 1rem;
-  position: relative;
-}
-
-.registerbutton {
-  margin-top: 2rem;
-  margin-left: 1rem;
-  position: relative;
+  margin-left: 5rem;
+  width: 7rem;
+  justify-self: center;
 }
 
 .link{
@@ -48,3 +38,14 @@
   margin-left: 0.65rem;
   position: relative;
 }
+
+.ampath{
+  position: relative;
+  padding: 0.5rem;
+  margin: 1rem;
+  width: 20rem;
+  background-color: whitesmoke;
+  font-weight: bold;
+  border: 1px solid whitesmoke;
+}
+

@@ -1,6 +1,5 @@
 const url = process.env.REACT_APP_URL;
-const token = localStorage.getItem('token');
-export const getAllEmployees = async () => {
+export const getAllEmployees = async (token) => {
   const options = {
     headers: {
       Authorization: `Bearer  ${token}`,
@@ -13,8 +12,6 @@ export const getAllEmployees = async () => {
       return response.json();
     })
     .then((res: any) => {
-      console.log(res);
-
       return res.data;
     })
     .catch((error: any) => {
