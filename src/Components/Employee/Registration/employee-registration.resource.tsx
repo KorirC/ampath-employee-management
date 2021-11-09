@@ -1,5 +1,5 @@
 import { EmployeeRegistrationFormProps } from './employee-registration-types';
-const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token');
 const baseUrl = process.env.REACT_APP_URL;
 
 export const saveEmployeeInformation = async (values: EmployeeRegistrationFormProps) => {

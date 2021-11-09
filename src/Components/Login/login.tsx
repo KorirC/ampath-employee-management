@@ -25,8 +25,8 @@ export const Login: React.FC<props> = ({ setIsAuthenticated, setRole }) => {
     loginUser(values).then((resp) => {
       if (resp.data.token) {
         setIsAuthenticated(true);
-        localStorage.setItem('token', resp.data.token);
-        localStorage.setItem('role', resp.data.results.role);
+        sessionStorage.setItem('token', resp.data.token);
+        sessionStorage.setItem('role', resp.data.results.role);
         setRole(resp.data.results.role);
         history.push('/Home');
       } else {
