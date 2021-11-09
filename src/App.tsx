@@ -26,15 +26,15 @@ import TimesheetUpload from './Components/Timesheets/timesheetUpload';
 import Dimensions from './Components/Dimensions/dimensions';
 
 enum roles {
-  ADMIN = 'admin',
-  USER = 'user',
+  ADMIN = 'Admin',
+  USER = 'User',
   HRMANAGER = 'hrManager',
 }
 function App() {
   const [sidebar, setSidebar] = useState<boolean>(true);
   const history = useHistory();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [role, setRole] = useState(localStorage.getItem('role'));
+  const [role, setRole] = useState(sessionStorage.getItem('role'));
 
   const onClickSideNavClosed = () => {
     if (sidebar == true) {
@@ -45,7 +45,7 @@ function App() {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     {
       token !== null ? setIsAuthenticated(true) : isAuthenticated;
     }
@@ -83,7 +83,7 @@ function App() {
                       id="logout"
                       aria-label="Log Out"
                       onClick={() => {
-                        localStorage.clear();
+                        sessionStorage.clear();
                         setIsAuthenticated(false);
                         history.push('/');
                       }}

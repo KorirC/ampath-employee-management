@@ -25,8 +25,8 @@ export const Login: React.FC<props> = ({ setIsAuthenticated, setRole }) => {
     loginUser(values).then((resp) => {
       if (resp.data.token) {
         setIsAuthenticated(true);
-        localStorage.setItem('token', resp.data.token);
-        localStorage.setItem('role', resp.data.results.role);
+        sessionStorage.setItem('token', resp.data.token);
+        sessionStorage.setItem('role', resp.data.results.role);
         setRole(resp.data.results.role);
         history.push('/Home');
       } else {
@@ -34,10 +34,6 @@ export const Login: React.FC<props> = ({ setIsAuthenticated, setRole }) => {
         setError('Wrong username or password');
       }
     });
-  };
-
-  const handleRegister = () => {
-    history.push('/RegisterUser');
   };
 
   return (
@@ -97,15 +93,6 @@ export const Login: React.FC<props> = ({ setIsAuthenticated, setRole }) => {
                       className={styles.logoutbutton}
                     >
                       Login
-                    </Button>
-                    <Button
-                      size="field"
-                      kind="secondary"
-                      type="submit"
-                      className={styles.registerbutton}
-                      onClick={handleRegister}
-                    >
-                      Register
                     </Button>
                   </div>
                   {/* <Link className={styles.link} href="#" renderIcon={ArrowUpRight16}>

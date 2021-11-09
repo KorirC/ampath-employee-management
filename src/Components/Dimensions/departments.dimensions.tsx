@@ -87,7 +87,7 @@ const Department: React.FC = () => {
               <Button className={styles.btn} size="default" kind="primary" type="submit">
                 Add Department
               </Button>
-              <Button className={styles.btn} size="default" kind="secondary">
+              <Button className={styles.btn} size="default" kind="secondary" type="reset">
                 Cancel
               </Button>
             </div>

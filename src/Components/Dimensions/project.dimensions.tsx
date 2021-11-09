@@ -56,6 +56,7 @@ const Project: React.FC = () => {
     addProject(values).then((resp) => {
       if (resp.status === 200) {
         setDimensionCreated(true);
+        helpers.resetForm({});
         console.log('success');
       } else {
         console.log('fail');
@@ -87,7 +88,7 @@ const Project: React.FC = () => {
               <Button className={styles.btn} size="default" kind="primary" type="submit" data-testid="add">
                 Add Project
               </Button>
-              <Button className={styles.btn} size="default" kind="secondary" data-testid="cancel">
+              <Button className={styles.btn} size="default" kind="secondary" data-testid="cancel" type="reset">
                 Cancel
               </Button>
             </div>

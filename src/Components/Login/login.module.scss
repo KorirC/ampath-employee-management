@@ -28,16 +28,9 @@
 
 .logoutbutton {
   margin-top: 2rem;
-  margin-right: 3rem;
-  position: relative;
+  margin-left: 5rem;
   width: 7rem;
-}
-
-.registerbutton {
-  margin-top: 2rem;
-  margin-left: 3rem;
-  position: relative;
-  width: 7rem;
+  justify-self: center;
 }
 
 .link{
@@ -56,43 +49,3 @@
   border: 1px solid whitesmoke;
 }
 
-//width is 250px or more
-@media screen and (min-width: 250px) {
-  body {
-    transition:all .2s linear; 
-    -o-transition:all .2s linear; 
-    -moz-transition:all .2s linear; 
-    -webkit-transition:all .2s linear;
-    width: max-content;
-    margin: 1rem;
-    height: fit-content;
-  }
-}
-
-// // @media screen and (max-width:1500px) {
-// //   body {
-// //     transition:all .2s linear; 
-// //     -o-transition:all .2s linear; 
-// //     -moz-transition:all .2s linear; 
-// //     -webkit-transition:all .2s linear;
-// //     width:150rem;
-// //     margin: 1rem 1rem;
-// //     //margin: auto;
-// //   }
-// //   img { 
-// //     width:15rem; 
-// //  }
-// // }
-
-// // @media screen and (min-width: 201px) {
-// //   body {
-// //     display: grid;
-// //   }
-// // }
-
-// // /* If the screen size is 600px or less, set the font-size of <div> to 30px */
-// // @media screen and (max-width: 1600px) {
-// //   body {
-// //     display: grid;
-// //   }
-// // }

@@ -1,7 +1,7 @@
 import { formInputProps, budgetInputProps } from './dimensions.types';
 
 const url = process.env.REACT_APP_URL;
-const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token');
 
 export const addBudget = async (values) => {
   return await fetch(url + `/budget`, {
