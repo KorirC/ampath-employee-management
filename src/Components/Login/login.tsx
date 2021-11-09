@@ -23,7 +23,7 @@ export const Login: React.FC<props> = ({ setIsAuthenticated, setRole }) => {
     helpers.setSubmitting(true);
 
     loginUser(values).then((resp) => {
-      if (resp.data.token) {
+      if (resp.code) {
         setIsAuthenticated(true);
         sessionStorage.setItem('token', resp.data.token);
         sessionStorage.setItem('role', resp.data.results.role);

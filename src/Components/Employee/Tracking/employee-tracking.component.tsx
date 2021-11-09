@@ -118,37 +118,37 @@ export const EmployeeTrackingForm: React.FC = () => {
 
   useMemo(() => {
     getProjects().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setProject(results);
     });
     getDepartments().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setDepartment(results);
     });
     getSites().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setSite(results);
     });
     getCounties().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setCounty(results);
     });
     getBudgets().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setBudget(results);
     });
     getPrograms().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setProgram(results);
