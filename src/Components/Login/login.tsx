@@ -36,10 +36,6 @@ export const Login: React.FC<props> = ({ setIsAuthenticated, setRole }) => {
     });
   };
 
-  const handleRegister = () => {
-    history.push('/RegisterUser');
-  };
-
   return (
     <>
       <Formik
@@ -97,15 +93,6 @@ export const Login: React.FC<props> = ({ setIsAuthenticated, setRole }) => {
                       className={styles.logoutbutton}
                     >
                       Login
-                    </Button>
-                    <Button
-                      size="field"
-                      kind="secondary"
-                      type="submit"
-                      className={styles.registerbutton}
-                      onClick={handleRegister}
-                    >
-                      Register
                     </Button>
                   </div>
                   {/* <Link className={styles.link} href="#" renderIcon={ArrowUpRight16}>
