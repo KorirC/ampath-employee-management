@@ -25,6 +25,11 @@ import { EmployeeStatusReport } from './Components/Reports/reports';
 import TimesheetUpload from './Components/Timesheets/timesheetUpload';
 import Dimensions from './Components/Dimensions/dimensions';
 
+enum roles {
+  ADMIN = 'admin',
+  USER = 'user',
+  HRMANAGER = 'hrManager',
+}
 function App() {
   const [sidebar, setSidebar] = useState<boolean>(true);
   const history = useHistory();
@@ -67,10 +72,10 @@ function App() {
                     <>
                       <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
                       <HeaderMenuItem href="/Timesheet">Timesheets</HeaderMenuItem>
-                      {(role === 'hrManager' || role === 'Admin') && (
+                      {(role === roles.HRMANAGER || role === roles.ADMIN) && (
                         <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
                       )}
-                      {role === 'Admin' && <HeaderMenuItem href="/Dimensions">Dimensions</HeaderMenuItem>}
+                      {role === roles.ADMIN && <HeaderMenuItem href="/Dimensions">Dimensions</HeaderMenuItem>}
                     </>
                   </HeaderNavigation>
                   <HeaderGlobalBar>
@@ -92,10 +97,10 @@ function App() {
           />
           <Switch>
             <ProtectedRoutes path="/Home" component={Dashboard} IsAuthenticated={isAuthenticated} />
-            {(role === 'Admin' || role === 'hrManager') && (
+            {(role === roles.ADMIN || role === roles.HRMANAGER) && (
               <ProtectedRoutes path="/Reports" component={EmployeeStatusReport} IsAuthenticated={isAuthenticated} />
             )}
-            {role === 'Admin' && (
+            {role === roles.ADMIN && (
               <ProtectedRoutes path="/Dimensions" component={Dimensions} IsAuthenticated={isAuthenticated} />
             )}
             <Route path="/Timesheet" component={TimesheetUpload} />
