@@ -1,6 +1,6 @@
 import { EmployeeTrackingInputProps } from './employee-tracking-types';
 const baseUrl = process.env.REACT_APP_URL;
-const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token');
 export const saveEmployeeTrackingInformation = async (values: EmployeeTrackingInputProps) => {
   const requestOptions = {
     method: 'POST',

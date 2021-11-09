@@ -90,7 +90,7 @@ const User: React.FC = () => {
     });
   };
 
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   useMemo(() => {
     fetchUsers();
   }, []);

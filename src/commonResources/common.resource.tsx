@@ -1,4 +1,4 @@
-const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token');
 import { useFetch } from '../globals/useFetch';
 
 const url = process.env.REACT_APP_URL;
