@@ -50,17 +50,7 @@ interface EmployeeDetails {
   Site: string;
 }
 
-interface EmployeeProfileProps {
-  parentCallback?(evnt): void;
-}
-
-export type Action = 'Add' | 'Edit';
-interface ParentCallbackProps {
-  pfNumber: number;
-  Action: Action;
-}
-
-const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
+const Employeeprofile: React.FC = () => {
   const [timesheets, setTimesheet] = useState([]);
   const [open, setOpen] = useState(false);
   const [firstRowIndex, setFirstRowIndex] = useState(0);
@@ -73,31 +63,33 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
 
   const timesheet = () => {
     getTimesheet(pf).then((res) => {
-      const results = res
-        .sort((a: any, b: any) => (b.month > a.month ? 1 : -1))
-        .map((timesheet: any) => {
-          return {
-            id: `${timesheet.timesheetsId}`,
-            pfNumber: timesheet.pfnumber,
-            month: dayjs(timesheet.month).format('MMMM YYYY'),
-            timesheetLink: (
-              <Link to={`/image/${timesheet.upload}`} onClick={() => setOpen(true)}>
-                {timesheet.upload}
-              </Link>
-            ),
-            action: (
-              <a
-                href="#"
-                onClick={(e) => {
-                  if (window.confirm('Delete timesheet?')) remove(timesheet.timesheetsId);
-                }}
-              >
-                Delete
-              </a>
-            ),
-          };
-        });
-      setTimesheet(results);
+      if (res) {
+        const results = res
+          .sort((a: any, b: any) => (b.month > a.month ? 1 : -1))
+          .map((timesheet: any) => {
+            return {
+              id: `${timesheet.timesheetsId}`,
+              pfNumber: timesheet.pfnumber,
+              month: dayjs(timesheet.month).format('MMMM YYYY'),
+              timesheetLink: (
+                <Link to={`/image/${timesheet.upload}`} onClick={() => setOpen(true)}>
+                  {timesheet.upload}
+                </Link>
+              ),
+              action: (
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    if (window.confirm('Delete timesheet?')) remove(timesheet.timesheetsId);
+                  }}
+                >
+                  Delete
+                </a>
+              ),
+            };
+          });
+        setTimesheet(results);
+      }
     });
   };
 
@@ -105,7 +97,7 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
     timesheet();
     getEmployeeProfile(pf)
       .then((response) => {
-        const result = response.map((resp) => {
+        const result = response?.map((resp) => {
           setEmployeeDetails(resp);
         });
       })
@@ -120,9 +112,11 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
     });
   };
 
-  const handleClick = () => {
-    props.parentCallback?.({ pfNumber: pf, edit: employeeDetails });
-    history.push('/AddEmployeeTracking');
+  const goToEmployeeTracking = () => {
+    history.push(`/AddEmployeeTracking/${pfNumber}`, history.location.pathname);
+  };
+  const goToEmployeeRegistration = () => {
+    history.push(`/EmployeeRegistration/${pf}`);
   };
   const getRowItems = (rows: Array<DataTableRow>) => {
     return rows.slice(firstRowIndex, firstRowIndex + currentPageSize).map((row: any) => ({ ...row }));
@@ -185,11 +179,14 @@ const Employeeprofile: React.FC<EmployeeProfileProps> = (props) => {
               <p>Project: {employeeDetails?.Project}</p> <p>Department: {employeeDetails?.Department}</p>{' '}
               <p>Program: {employeeDetails?.ProgramArea}</p> <p>Site: {employeeDetails?.Site}</p>
             </div>
-            <p>
-              <Button type="submit" className={styles.button} onClick={handleClick}>
-                Update Details
+            <>
+              <Button type="button" className={styles.button} kind="primary" onClick={goToEmployeeTracking}>
+                Update tracking details
               </Button>
-            </p>
+              <Button type="button" className={styles.button} kind="secondary" onClick={goToEmployeeRegistration}>
+                Update employee details
+              </Button>
+            </>
           </Column>
         </Row>
       </div>

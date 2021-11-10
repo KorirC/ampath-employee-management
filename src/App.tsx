@@ -22,22 +22,19 @@ import { ShowTimesheet } from './Components/Employee/Profile/timesheetImage';
 import { EmployeeRegistrationForm } from './Components/Employee/Registration/employee-registration.component';
 import { EmployeeTrackingForm } from './Components/Employee/Tracking/employee-tracking.component';
 import { EmployeeStatusReport } from './Components/Reports/reports';
-import { EmployeeTrackingInputProps } from './Components/Employee/Tracking/employee-tracking-types';
 import TimesheetUpload from './Components/Timesheets/timesheetUpload';
-interface CallBackValuesProps {
-  pfNumber: number;
-  edit?: EmployeeTrackingInputProps;
+import Dimensions from './Components/Dimensions/dimensions';
+
+enum roles {
+  ADMIN = 'Admin',
+  USER = 'User',
+  HRMANAGER = 'hrManager',
 }
-
 function App() {
-  const [open, setOpen] = useState<boolean>(false);
   const [sidebar, setSidebar] = useState<boolean>(true);
-  const [callBackValues, setCallBackValues] = useState<CallBackValuesProps>();
   const history = useHistory();
-
-  const handleCallback = (data) => {
-    setCallBackValues(data);
-  };
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState(sessionStorage.getItem('role'));
 
   const onClickSideNavClosed = () => {
     if (sidebar == true) {
@@ -46,13 +43,14 @@ function App() {
       setSidebar(true);
     }
   };
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     {
       token !== null ? setIsAuthenticated(true) : isAuthenticated;
     }
   }, []);
+
   return (
     <>
       {isAuthenticated ? (
@@ -71,16 +69,21 @@ function App() {
                     PLUS
                   </HeaderName>
                   <HeaderNavigation aria-label="AMPATH">
-                    <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
-                    <HeaderMenuItem href="/Timesheet">Timesheets</HeaderMenuItem>
-                    <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
+                    <>
+                      <HeaderMenuItem href="/Home">Home</HeaderMenuItem>
+                      <HeaderMenuItem href="/Timesheet">Timesheets</HeaderMenuItem>
+                      {(role === roles.HRMANAGER || role === roles.ADMIN) && (
+                        <HeaderMenuItem href="/Reports">Reports</HeaderMenuItem>
+                      )}
+                      {role === roles.ADMIN && <HeaderMenuItem href="/Dimensions">Dimensions</HeaderMenuItem>}
+                    </>
                   </HeaderNavigation>
                   <HeaderGlobalBar>
                     <HeaderGlobalAction
                       id="logout"
                       aria-label="Log Out"
                       onClick={() => {
-                        localStorage.clear();
+                        sessionStorage.clear();
                         setIsAuthenticated(false);
                         history.push('/');
                       }}
@@ -94,34 +97,37 @@ function App() {
           />
           <Switch>
             <ProtectedRoutes path="/Home" component={Dashboard} IsAuthenticated={isAuthenticated} />
-            <ProtectedRoutes path="/Reports" component={EmployeeStatusReport} IsAuthenticated={isAuthenticated} />
+            {(role === roles.ADMIN || role === roles.HRMANAGER) && (
+              <ProtectedRoutes path="/Reports" component={EmployeeStatusReport} IsAuthenticated={isAuthenticated} />
+            )}
+            {role === roles.ADMIN && (
+              <ProtectedRoutes path="/Dimensions" component={Dimensions} IsAuthenticated={isAuthenticated} />
+            )}
             <Route path="/Timesheet" component={TimesheetUpload} />
             <ProtectedRoutes
-              path="/EmployeeRegistration"
+              path="/EmployeeRegistration/:pfNumber?"
               component={EmployeeRegistrationForm}
               IsAuthenticated={isAuthenticated}
             />
             <Route path="/image/:filename" component={ShowTimesheet} />
             <ProtectedRoutes
               path="/EmployeeProfile/:pfNumber"
-              component={() => <Employeeprofile parentCallback={handleCallback} />}
+              component={Employeeprofile}
               IsAuthenticated={isAuthenticated}
             />
             <ProtectedRoutes
-              path="/AddEmployeeTracking"
+              path="/AddEmployeeTracking/:pfNumber"
               component={EmployeeTrackingForm}
               IsAuthenticated={isAuthenticated}
-            >
-              <EmployeeTrackingForm pfNumber={callBackValues?.pfNumber} edit={callBackValues?.edit} />
-            </ProtectedRoutes>
+            />
+            <ProtectedRoutes path="/RegisterUser" component={Register} IsAuthenticated={isAuthenticated} />
           </Switch>
         </>
       ) : (
         <Switch>
           <Route exact path="/">
-            <Login setIsAuthenticated={setIsAuthenticated} />
+            <Login setIsAuthenticated={setIsAuthenticated} setRole={setRole} />
           </Route>
-          <Route path="/RegisterUser" component={Register}></Route>
         </Switch>
       )}
     </>

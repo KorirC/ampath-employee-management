@@ -1,5 +1,5 @@
 const BaseUrl = process.env.REACT_APP_URL;
-const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token');
 export const getEmployeeProfile = async (pf) => {
   return await fetch(BaseUrl + `/search?pfnumber=${pf}`, {
     headers: {

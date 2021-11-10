@@ -12,9 +12,10 @@ import ampath from '../../images/ampath.png';
 
 interface props {
   setIsAuthenticated: any;
+  setRole: any;
 }
 
-export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
+export const Login: React.FC<props> = ({ setIsAuthenticated, setRole }) => {
   const [error, setError] = useState('');
   const history = useHistory();
 
@@ -22,19 +23,17 @@ export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
     helpers.setSubmitting(true);
 
     loginUser(values).then((resp) => {
-      if (resp.data.token) {
+      if (resp.code) {
         setIsAuthenticated(true);
-        localStorage.setItem('token', resp.data.token);
+        sessionStorage.setItem('token', resp.data.token);
+        sessionStorage.setItem('role', resp.data.results.role);
+        setRole(resp.data.results.role);
         history.push('/Home');
       } else {
         console.log('error');
         setError('Wrong username or password');
       }
     });
-  };
-
-  const handleRegister = () => {
-    history.push('/RegisterUser');
   };
 
   return (
@@ -94,15 +93,6 @@ export const Login: React.FC<props> = ({ setIsAuthenticated }) => {
                       className={styles.logoutbutton}
                     >
                       Login
-                    </Button>
-                    <Button
-                      size="field"
-                      kind="secondary"
-                      type="submit"
-                      className={styles.registerbutton}
-                      onClick={handleRegister}
-                    >
-                      Register
                     </Button>
                   </div>
                   {/* <Link className={styles.link} href="#" renderIcon={ArrowUpRight16}>

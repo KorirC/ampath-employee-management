@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { useFormik } from 'formik';
 import dayjs from 'dayjs';
 import {
   Form,
@@ -12,10 +11,11 @@ import {
   SelectItem,
   Column,
   ToastNotification,
+  Modal,
 } from 'carbon-components-react';
-import { EmployeeTrackingInputProps } from './employee-tracking-types';
+import { EmployeeTrackingInputProps, FormValues } from './employee-tracking-types';
 import { validationSchema } from './employee-tracking-validation';
-import { saveEmployeeTrackingInformation } from './employee-tracking-resource';
+import { saveEmployeeTrackingInformation, getEmployeeProfileInformation } from './employee-tracking-resource';
 import styles from './employee-tracking.module.scss';
 import {
   getBudgets,
@@ -25,137 +25,130 @@ import {
   getProjects,
   getSites,
 } from '../../../commonResources/common.resource';
-import { useHistory } from 'react-router';
+import { useHistory, useParams } from 'react-router-dom';
 
-export interface EmployeeTrackingFormProps {
-  pfNumber: number | undefined;
-  parentCallback?(evnt): void;
-  edit?: EmployeeTrackingInputProps;
-}
-
-export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props) => {
-  const [projectId, setProject] = useState<Array<any>>([]);
-  const [departmentId, setDepartment] = useState<Array<any>>();
-  const [siteId, setSite] = useState<Array<any>>();
-  const [countyId, setCounty] = useState<Array<any>>();
-  const [budgetId, setBudget] = useState<Array<any>>();
-  const [programId, setProgram] = useState<Array<any>>();
+export const EmployeeTrackingForm: React.FC = () => {
+  const [project, setProject] = useState<Array<any>>([]);
+  const [department, setDepartment] = useState<Array<any>>();
+  const [site, setSite] = useState<Array<any>>();
+  const [county, setCounty] = useState<Array<any>>();
+  const [budget, setBudget] = useState<Array<any>>();
+  const [program, setProgram] = useState<Array<any>>();
   const [formSuccess, setFormSuccess] = useState<boolean>(false);
   const [formError, setFormError] = useState<boolean>(false);
+  const [editValues, setEditValues] = useState<Object>();
   const [edited, setEdited] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const history = useHistory();
-  const {
-    register,
-    setValue,
-    getValues,
-    watch,
-    handleSubmit,
-    formState: { errors, touchedFields },
-  } = useForm({ resolver: yupResolver(validationSchema), mode: 'all' });
-  const editValues = props.edit;
-  const inputNames = [
-    'projectId',
-    'departmentId',
-    'siteId',
-    'countyId',
-    'budgetId',
-    'programId',
-    'endOfContract',
-    'dateOfJoining',
-    'dateOfLeaving',
-    'jobSpecification',
-  ];
-
-  useMemo(() => {
-    editValues && setEdited(true);
-    inputNames.map((name) => {
-      Object.entries({ ...editValues })
-        .filter(([key]) => key == name)
-        .map((values) => {
-          const initialValues =
-            values[0] === 'endOfContract' || values[0] === 'dateOfJoining' || values[0] === 'dateOfLeaving'
-              ? new Date(values[1])
-              : values[1];
-          setValue(values[0], initialValues);
-        });
-    });
-  }, [editValues]);
+  const { pfNumber } = useParams<{ pfNumber: string }>();
 
   useEffect(() => {
-    Object.keys(touchedFields).map((names) => {
-      Object.entries({ ...editValues })
-        .filter(([key]) => key == names)
-        .map((values) => {
-          const insertedValue =
-            typeof watch(names) == 'object' ? dayjs(watch(names)).format('YYYY-MM-DD') : watch(names);
-          if (insertedValue != values[1]) {
-            setEdited(false);
-          } else {
-            setEdited(true);
-          }
+    getEmployeeProfileInformation(pfNumber).then((response) => {
+      if (response) {
+        response.reverse().map((resp) => {
+          Object.entries(resp).map((data) => {
+            formik.setFieldValue(data[0], data[1]);
+            setEditValues(resp);
+          });
         });
+      }
     });
-  }, [{ ...touchedFields }, editValues]);
+  }, [pfNumber]);
+
+  const prevUrl = `${history.location.state}`;
+  useEffect(() => {
+    prevUrl.match(/\/EmployeeRegistration(\/)?$/g) ? setShowModal(true) : setShowModal(false);
+  }, [prevUrl]);
 
   const handleFormSubmit = (values: EmployeeTrackingInputProps) => {
-    values.pfNumber = props.pfNumber;
-    values.project = values.projectId;
-    values.department = values.departmentId;
-    values.site = values.siteId;
-    values.county = values.countyId;
-    values.countyBudget = values.budgetId;
-    values.programArea = values.programId;
-    values.endOfContract = dayjs(values.endOfContract).format('YYYY-MM-DD');
-    values.dateOfJoining = dayjs(values.dateOfJoining).format('YYYY-MM-DD');
-    values.dateOfLeaving = dayjs(values.dateOfLeaving).format('YYYY-MM-DD');
-    console.log('Values', values);
+    !editValues && (values.pfNumber = pfNumber);
     saveEmployeeTrackingInformation(values)
       .then((response) => {
         if (response.status === 200) {
           setFormSuccess(true);
-          props.parentCallback?.({ formSuccess: true });
-          setTimeout(() => history.push(`/EmployeeProfile/${props.pfNumber}`), 2000);
+          setTimeout(() => setOpen(true), 1000);
+          !showModal && setTimeout(() => goToProfile(), 1000);
         }
       })
       .catch((error) => {
         setFormError(true);
-        props.parentCallback?.({ formSuccess: false });
       });
+  };
+
+  const formik = useFormik({
+    initialValues: FormValues,
+    onSubmit: handleFormSubmit,
+    validationSchema: validationSchema,
+  });
+
+  useEffect(() => {
+    const entries: Array<{ name: string; sameValue: boolean }> = [];
+    editValues &&
+      Object.entries(formik.values).map(([key, value]) => {
+        Object.entries(editValues)
+          .filter(([k]) => k === key)
+          .map((v) => {
+            const insertedValue =
+              key === 'endOfContract' || key === 'dateOfJoining' || key === 'dateOfLeaving'
+                ? dayjs(`${value}`).format('YYYY-MM-DD')
+                : value;
+            const existingValue =
+              v[0] === 'endOfContract' || v[0] === 'dateOfJoining' || v[0] === 'dateOfLeaving'
+                ? dayjs(`${v[1]}`).format('YYYY-MM-DD')
+                : v[1];
+            if (existingValue != insertedValue) {
+              entries.push({ name: v[0], sameValue: false });
+            } else {
+              entries.push({ name: v[0], sameValue: true });
+            }
+          });
+      });
+    const obj = entries.filter((k) => k.sameValue === false);
+    editValues ? (obj.length > 0 ? setEdited(false) : setEdited(true)) : setEdited(false);
+  }, [formik.values, editValues]);
+
+  const goToProfile = () => {
+    history.push(`/EmployeeProfile/${pfNumber}`);
+  };
+
+  const goToNewRegistration = () => {
+    history.goBack();
   };
 
   useMemo(() => {
     getProjects().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setProject(results);
     });
     getDepartments().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setDepartment(results);
     });
     getSites().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setSite(results);
     });
     getCounties().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setCounty(results);
     });
     getBudgets().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setBudget(results);
     });
     getPrograms().then((response) => {
-      let results = response.data.map((resp) => {
+      let results = response?.data?.map((resp) => {
         return resp;
       });
       setProgram(results);
@@ -168,7 +161,7 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
         <ToastNotification
           title="Data saved successfully"
           className={styles.toast}
-          timeout={3000}
+          timeout={2000}
           subtitle="Employee tracking data saved successfully"
           kind="success"
         />
@@ -177,25 +170,27 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
         <ToastNotification
           title="Error saving data"
           className={styles.toast}
-          timeout={3000}
+          timeout={2000}
           subtitle="Employee tracking data not saved"
           kind="error"
         />
       )}
 
-      <Form className={styles.form} onSubmit={handleSubmit(handleFormSubmit)}>
+      <Form className={styles.form} onSubmit={formik.handleSubmit}>
         <h4 className={styles.header}>Update Details</h4>
         <Column>
           <Select
             id="project"
             labelText="Project"
-            {...register('projectId')}
-            invalid={!!errors.projectId}
-            invalidText={errors.projectId?.message}
-            value={watch('projectId')}
+            name="project"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            invalid={!!(formik.touched.project && formik.errors.project)}
+            invalidText={formik.errors.project}
+            value={formik.values.project}
           >
             <SelectItem text="--Choose project--" value="" />
-            {projectId?.map((item, index) => (
+            {project?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.projectId} />
             ))}
           </Select>
@@ -204,13 +199,15 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <Select
             id="department"
             labelText="Department"
-            {...register('departmentId')}
-            invalid={!!errors.departmentId}
-            invalidText={errors.departmentId?.message}
-            value={watch('departmentId')}
+            name="department"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            invalid={!!(formik.touched.department && formik.errors.department)}
+            invalidText={formik.errors.department}
+            value={formik.values.department}
           >
             <SelectItem text="--Choose department--" value="" />
-            {departmentId?.map((item, index) => (
+            {department?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.departmentId} />
             ))}
           </Select>
@@ -219,13 +216,15 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <Select
             id="site"
             labelText="Site"
-            {...register('siteId')}
-            invalid={!!errors.siteId}
-            invalidText={errors.siteId?.message}
-            value={watch('siteId')}
+            name="site"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            invalid={!!(formik.touched.site && formik.errors.site)}
+            invalidText={formik.errors.site}
+            value={formik.values.site}
           >
             <SelectItem text="--Choose site--" value="" />
-            {siteId?.map((item, index) => (
+            {site?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.siteId} />
             ))}
           </Select>
@@ -234,13 +233,15 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <Select
             id="county"
             labelText="County"
-            {...register('countyId')}
-            invalid={!!errors.countyId}
-            invalidText={errors.countyId?.message}
-            value={watch('countyId')}
+            name="county"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            invalid={!!(formik.touched.county && formik.errors.county)}
+            invalidText={formik.errors.county}
+            value={formik.values.county}
           >
             <SelectItem text="--Choose county--" value="" />
-            {countyId?.map((item, index) => (
+            {county?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.countyId} />
             ))}
           </Select>
@@ -249,13 +250,15 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <Select
             id="countyBudget"
             labelText="County budget"
-            {...register('budgetId')}
-            invalid={!!errors.budgetId}
-            invalidText={errors.budgetId?.message}
-            value={watch('budgetId')}
+            name="countyBudget"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            invalid={!!(formik.touched.countyBudget && formik.errors.countyBudget)}
+            invalidText={formik.errors.countyBudget}
+            value={formik.values.countyBudget}
           >
             <SelectItem text="--Choose county budget--" value="" />
-            {budgetId?.map((item, index) => (
+            {budget?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.budgetId} />
             ))}
           </Select>
@@ -264,13 +267,15 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <Select
             id="programArea"
             labelText="Program area"
-            {...register('programId')}
-            invalid={!!errors.programId}
-            invalidText={errors.programId?.message}
-            value={watch('programId')}
+            name="programArea"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            invalid={!!(formik.touched.programArea && formik.errors.programArea)}
+            invalidText={formik.errors.programArea}
+            value={formik.values.programArea}
           >
             <SelectItem text="--Choose program area--" value="" />
-            {programId?.map((item, index) => (
+            {program?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.programId} />
             ))}
           </Select>
@@ -278,48 +283,48 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
         <Column>
           <DatePicker
             datePickerType="single"
-            onChange={([event]) => setValue('endOfContract', new Date(event), { shouldValidate: true })}
-            value={watch('endOfContract')}
+            onChange={([event]) => formik.setFieldValue('endOfContract', new Date(event))}
+            onBlur={formik.handleBlur}
+            value={dayjs(formik.values.endOfContract).format('MM/DD/YYYY')}
           >
             <DatePickerInput
               id="endOfContract"
               labelText="End of contract"
-              {...register('endOfContract')}
-              placeholder="mm/dd/yyyy"
-              invalid={!!errors.endOfContract}
-              invalidText={errors.endOfContract?.message}
+              name="endOfContract"
+              invalid={!!(formik.touched.endOfContract && formik.errors.endOfContract)}
+              invalidText={formik.errors.endOfContract}
             />
           </DatePicker>
         </Column>
         <Column>
           <DatePicker
             datePickerType="single"
-            onChange={([event]) => setValue('dateOfJoining', new Date(event), { shouldValidate: true })}
-            value={watch('dateOfJoining')}
+            onChange={([event]) => formik.setFieldValue('dateOfJoining', new Date(event))}
+            onBlur={formik.handleBlur}
+            value={dayjs(formik.values.dateOfJoining).format('MM/DD/YYYY')}
           >
             <DatePickerInput
               id="dateOfJoining"
               labelText="Date of joining"
-              {...register('dateOfJoining')}
-              placeholder="mm/dd/yyyy"
-              invalid={!!errors.dateOfJoining}
-              invalidText={errors.dateOfJoining?.message}
+              name="dateOfJoining"
+              invalid={!!(formik.touched.dateOfJoining && formik.errors.dateOfJoining)}
+              invalidText={formik.errors.dateOfJoining}
             />
           </DatePicker>
         </Column>
         <Column>
           <DatePicker
             datePickerType="single"
-            onChange={([event]) => setValue('dateOfLeaving', new Date(event), { shouldValidate: true })}
-            value={watch('dateOfLeaving')}
+            onChange={([event]) => formik.setFieldValue('dateOfLeaving', new Date(event))}
+            onBlur={formik.handleBlur}
+            value={dayjs(formik.values.dateOfLeaving).format('MM/DD/YYYY')}
           >
             <DatePickerInput
               id="dateOfLeaving"
               labelText="Date of leaving"
-              {...register('dateOfLeaving')}
-              placeholder="mm/dd/yyyy"
-              invalid={!!errors.dateOfLeaving}
-              invalidText={errors.dateOfLeaving?.message}
+              name="dateOfLeaving"
+              invalid={!!(formik.touched.dateOfLeaving && formik.errors.dateOfLeaving)}
+              invalidText={formik.errors.dateOfLeaving}
             />
           </DatePicker>
         </Column>
@@ -327,15 +332,38 @@ export const EmployeeTrackingForm: React.FC<EmployeeTrackingFormProps> = (props)
           <TextInput
             id="jobSpecification"
             labelText="Job specification"
-            {...register('jobSpecification')}
-            invalid={!!errors.jobSpecification}
-            invalidText={errors.jobSpecification?.message}
+            name="jobSpecification"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            invalid={!!(formik.touched.jobSpecification && formik.errors.jobSpecification)}
+            invalidText={formik.errors.jobSpecification}
+            value={formik.values.jobSpecification}
           />
         </Column>
         <Column>
           <Button type="submit" className={styles.submitBtn} disabled={edited} kind="primary">
             Save
           </Button>
+          <Modal
+            open={showModal && open}
+            onRequestClose={(e) => {
+              setOpen(false);
+              goToProfile;
+            }}
+            passiveModal
+            preventCloseOnClickOutside
+            modalHeading="Registration successfully completed"
+          >
+            <p>Would you like to start a new registration or continue to the employee profile?</p>
+            <div className={styles.modalBtn}>
+              <Button onClick={goToNewRegistration} className={styles.registerBtn}>
+                Start a new registration?
+              </Button>
+              <Button kind="tertiary" onClick={goToProfile} className={styles.continueBtn}>
+                Continue to profile?
+              </Button>
+            </div>
+          </Modal>
         </Column>
       </Form>
     </>
