@@ -78,7 +78,7 @@ const EmployeeList: React.FC = () => {
         return {
           ...employee,
           id: employee.id,
-          name: `${employee.firstName} ${employee.middleName} ${employee.lastName}`,
+          name: `${employee.firstName} ${employee.middleName || ''} ${employee.lastName || ''}`,
           idNumber: employee.idNumber,
           dob: dayjs(employee.dob).format('YYYY-MM-DD'),
           age: calculate_age(employee.dob),
@@ -97,7 +97,7 @@ const EmployeeList: React.FC = () => {
     });
   }, []);
 
-  const filterField = (search: string, value: string) => value.toLowerCase().includes(search.toLowerCase());
+  const filterField = (search: string, value: string) => value?.toLowerCase().includes(search.toLowerCase());
   const filteredEmployees = employees.filter((item) => {
     if (searchTerm === '') {
       return item;
@@ -184,9 +184,7 @@ const EmployeeList: React.FC = () => {
                         onClick={() => handleRowClick(row.cells[0].value)}
                         title="Click to view profile"
                         style={{ cursor: 'pointer' }}
-                        className={`${
-                          row.cells[2].value >= 55 && row.cells[8].value === 'Active' ? styles.retire : styles.normal
-                        }`}
+                        className={`${row.cells[2].value >= 55 ? styles.retire : styles.normal}`}
                       >
                         {row.cells.map((cell: any) => (
                           <TableCell key={cell.id}>{cell.value}</TableCell>
