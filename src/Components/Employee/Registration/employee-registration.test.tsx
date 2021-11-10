@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import user from '@testing-library/user-event';
+import { BrowserRouter } from 'react-router-dom';
 import { EmployeeRegistrationForm } from './employee-registration.component';
 
 jest.mock('react-router-dom', () => ({
@@ -9,7 +10,11 @@ jest.mock('react-router-dom', () => ({
 
 describe('"<EmployeeRegistrationForm>" component', () => {
   beforeEach(() => {
-    render(<EmployeeRegistrationForm />);
+    render(
+      <BrowserRouter>
+        <EmployeeRegistrationForm />
+      </BrowserRouter>,
+    );
   });
 
   describe('User interface texts', () => {

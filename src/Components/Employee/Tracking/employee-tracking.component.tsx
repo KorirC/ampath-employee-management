@@ -12,6 +12,7 @@ import {
   Column,
   ToastNotification,
   Modal,
+  Row,
 } from 'carbon-components-react';
 import { EmployeeTrackingInputProps, FormValues } from './employee-tracking-types';
 import { validationSchema } from './employee-tracking-validation';
@@ -25,7 +26,7 @@ import {
   getProjects,
   getSites,
 } from '../../../commonResources/common.resource';
-import { useHistory, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 
 export const EmployeeTrackingForm: React.FC = () => {
   const [project, setProject] = useState<Array<any>>([]);
@@ -177,7 +178,12 @@ export const EmployeeTrackingForm: React.FC = () => {
       )}
 
       <Form className={styles.form} onSubmit={formik.handleSubmit}>
-        <h4 className={styles.header}>Update Details</h4>
+        <Row className={styles.header}>
+          <h4>Update Details</h4>
+          <Link to={`/EmployeeProfile/${pfNumber}`} className={styles.backBtn}>
+            Back
+          </Link>
+        </Row>
         <Column>
           <Select
             id="project"

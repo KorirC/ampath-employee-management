@@ -27,7 +27,7 @@ import {
   saveEmployeeInformation,
   updateEmployeeInformation,
 } from './employee-registration.resource';
-import { useHistory, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 
 export const EmployeeRegistrationForm: React.FC = () => {
   const [formIsComplete, setFormIsComplete] = useState<boolean>(false);
@@ -117,9 +117,7 @@ export const EmployeeRegistrationForm: React.FC = () => {
   }, [formik.values, editValues]);
 
   useEffect(() => {
-    formIsComplete &&
-      pfNumber &&
-      setTimeout(() => history.push(`/AddEmployeeTracking/${pfNumber}`, history.location.pathname), 1000);
+    formIsComplete && pfNumber && setTimeout(() => history.push(`/EmployeeProfile/${pfNumber}`), 1000);
   }, [formIsComplete, pfNumber]);
 
   const basicRef = useRef<null | HTMLHeadingElement>(null);
@@ -155,9 +153,12 @@ export const EmployeeRegistrationForm: React.FC = () => {
           <Row>
             <Column>
               <Form className={styles.form} onSubmit={formik.handleSubmit}>
-                <h4 ref={basicRef} className={styles.header}>
-                  1. Basic info
-                </h4>
+                <Row className={styles.header}>
+                  <h4 ref={basicRef}>1. Basic info</h4>
+                  <Link to={update ? `/EmployeeProfile/${pf}` : '/Home'} className={styles.backBtn}>
+                    Back
+                  </Link>
+                </Row>
                 <RadioButtonGroup
                   name="salutation"
                   legendText="Salutation"
@@ -335,26 +336,22 @@ export const EmployeeRegistrationForm: React.FC = () => {
         </Grid>
       </div>
       {formIsComplete && (
-        <>
-          <ToastNotification
-            title={update ? 'Data updated successfully' : 'Data saved successfully'}
-            timeout={1000}
-            className={styles.toast}
-            subtitle={
-              update
-                ? 'Employee registration data updated successfully'
-                : 'Employee registration data saved successfully'
-            }
-            kind="success"
-          />
-        </>
+        <ToastNotification
+          title={update ? 'Data updated successfully' : 'Data saved successfully'}
+          timeout={1000}
+          className={styles.toast}
+          subtitle={
+            update ? 'Employee registration data updated successfully' : 'Employee registration data saved successfully'
+          }
+          kind="success"
+        />
       )}
       {errorInForm && (
         <ToastNotification
-          title="Error saving data"
+          title={update ? 'Error updating data' : 'Error saving data'}
           timeout={1000}
           className={styles.toast}
-          subtitle="Employee registration data not saved"
+          subtitle={update ? 'Employee registration data not updated' : 'Employee registration data not saved'}
           kind="error"
         />
       )}
