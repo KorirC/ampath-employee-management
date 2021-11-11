@@ -12,6 +12,7 @@ import {
   Column,
   Pagination,
   DataTableRow,
+  Grid,
 } from 'carbon-components-react';
 import { useMemo, useState } from 'react';
 import styles from './employee-profile.module.css';
@@ -123,12 +124,12 @@ const Employeeprofile: React.FC = () => {
   };
   const rows = getRowItems(timesheets);
   return (
-    <>
+    <Grid>
       <div className={styles.card}>
         <Row>
           <Column>
             <h3>
-              {employeeDetails?.firstName} {employeeDetails?.middleName} {employeeDetails?.lastName}
+              {employeeDetails?.firstName} {employeeDetails?.middleName || ''} {employeeDetails?.lastName || ''}
             </h3>
             <p className="title">{employeeDetails?.email}</p>
             <p>{employeeDetails?.telephone}</p>
@@ -190,7 +191,7 @@ const Employeeprofile: React.FC = () => {
           </Column>
         </Row>
       </div>
-    </>
+    </Grid>
   );
 };
 export default Employeeprofile;

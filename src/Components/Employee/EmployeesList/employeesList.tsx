@@ -19,6 +19,7 @@ import {
   Button,
   TableToolbarAction,
   TableToolbarMenu,
+  Grid,
 } from 'carbon-components-react';
 import { Employee, getAllEmployees } from './employee.resource';
 import dayjs from 'dayjs';
@@ -27,6 +28,7 @@ import styles from './employeeList.module.scss';
 import { Download16 as Download } from '@carbon/icons-react';
 import { CSVLink } from 'react-csv';
 import { calculate_age } from '../../../globals/calculateAge';
+import { Add16 } from '@carbon/icons-react';
 
 const EmployeeList: React.FC = () => {
   const history = useHistory();
@@ -128,7 +130,7 @@ const EmployeeList: React.FC = () => {
     history.push(`/EmployeeRegistration`);
   };
   return (
-    <>
+    <Grid>
       <div className={styles.box}></div>Yet to retire
       {employees.length > 0 ? (
         <>
@@ -164,8 +166,8 @@ const EmployeeList: React.FC = () => {
                         </CSVLink>
                       </TableToolbarAction>
                     </TableToolbarMenu>
-                    <Button kind="secondary" onClick={registerEmployee}>
-                      Create New Employee
+                    <Button kind="secondary" onClick={registerEmployee} renderIcon={Add16}>
+                      Add
                     </Button>
                   </TableToolbarContent>
                 </TableToolbar>
@@ -215,7 +217,7 @@ const EmployeeList: React.FC = () => {
       ) : (
         <DataTableSkeleton role="progressbar" />
       )}
-    </>
+    </Grid>
   );
 };
 export default EmployeeList;
