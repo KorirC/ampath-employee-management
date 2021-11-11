@@ -1,46 +1,6 @@
-.headingStyle {
-    text-align: center;
-    font-weight: bolder;
-    margin-top: 20px;
-}
-
-.profileItems {
-    border: 1px solid black;
-    margin: 100px;
-}
-
-.employeeProfile {
-    float: left;
-    width: 50%;
-    margin: 60px;
-    font-weight: bolder;
-}
-
-.datatable {
-    padding: 50px;
-}
-
-.employeeProfile a {
-    text-transform: uppercase;
-    font-weight: lighter;
-}
-
-.employeeProfile br {
-    margin: 10px;
-}
-
-.btn {
-    margin: 50px;
-    padding: 5px;
-    margin-top: 0px;
-}
-.zoom{
-    display: block;
-    margin-right: auto;
-}
 .card {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    max-width: 70%;
+    width:80%;
     margin: auto;
     margin-top: 10%;
     padding: 2rem;
@@ -52,32 +12,16 @@
     color: grey;
     font-size: 18px;
   }
-  
-  .button {
-    text-align: center;
-    cursor: pointer;
-    font-size: 16px;
-  }
 
   .button + .button {
-    margin-left: 0.3rem;
+    margin: 0.2rem 0 0.3rem 0.3rem;
   }
 
   .workDetails p{
       display: inline-block;
-      padding: 2rem;
+      padding: 0.275rem;
   }
 
   h3{
       font-family: auto;
   }
-
-  .updateBtn {
-    padding: 10px;
-    font-size: 16px;
-  }
-  /* a {
-    text-decoration: none;
-    font-size: 22px;
-    color: black;
-  } */

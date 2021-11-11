@@ -52,7 +52,7 @@ function App() {
   }, []);
 
   return (
-    <>
+    <div className={styles.body}>
       {isAuthenticated ? (
         <>
           <HeaderContainer
@@ -130,7 +130,7 @@ function App() {
           </Route>
         </Switch>
       )}
-    </>
+    </div>
   );
 }
 
