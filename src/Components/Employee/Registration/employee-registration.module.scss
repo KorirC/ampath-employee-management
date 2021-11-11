@@ -8,9 +8,25 @@
 }
 
 .form .header{
+    position: relative;
     padding: 10px;
     margin: 10px;
     border-bottom: 1px solid rgb(21, 109, 131);
+}
+
+.form .header .backBtn{
+    position: absolute;
+    right: 0;
+    text-decoration: none;
+    border: 1px solid black;
+    color: black;
+    font-weight: bold;
+    padding: .4rem;
+}
+
+.form .header .backBtn:hover{
+    background: black;
+    color: white;
 }
 
 .form .submitBtn {

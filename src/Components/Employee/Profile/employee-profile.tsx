@@ -63,31 +63,33 @@ const Employeeprofile: React.FC = () => {
 
   const timesheet = () => {
     getTimesheet(pf).then((res) => {
-      const results = res
-        .sort((a: any, b: any) => (b.month > a.month ? 1 : -1))
-        .map((timesheet: any) => {
-          return {
-            id: `${timesheet.timesheetsId}`,
-            pfNumber: timesheet.pfnumber,
-            month: dayjs(timesheet.month).format('MMMM YYYY'),
-            timesheetLink: (
-              <Link to={`/image/${timesheet.upload}`} onClick={() => setOpen(true)}>
-                {timesheet.upload}
-              </Link>
-            ),
-            action: (
-              <a
-                href="#"
-                onClick={(e) => {
-                  if (window.confirm('Delete timesheet?')) remove(timesheet.timesheetsId);
-                }}
-              >
-                Delete
-              </a>
-            ),
-          };
-        });
-      setTimesheet(results);
+      if (res) {
+        const results = res
+          .sort((a: any, b: any) => (b.month > a.month ? 1 : -1))
+          .map((timesheet: any) => {
+            return {
+              id: `${timesheet.timesheetsId}`,
+              pfNumber: timesheet.pfnumber,
+              month: dayjs(timesheet.month).format('MMMM YYYY'),
+              timesheetLink: (
+                <Link to={`/image/${timesheet.upload}`} onClick={() => setOpen(true)}>
+                  {timesheet.upload}
+                </Link>
+              ),
+              action: (
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    if (window.confirm('Delete timesheet?')) remove(timesheet.timesheetsId);
+                  }}
+                >
+                  Delete
+                </a>
+              ),
+            };
+          });
+        setTimesheet(results);
+      }
     });
   };
 
@@ -95,7 +97,7 @@ const Employeeprofile: React.FC = () => {
     timesheet();
     getEmployeeProfile(pf)
       .then((response) => {
-        const result = response.map((resp) => {
+        const result = response?.map((resp) => {
           setEmployeeDetails(resp);
         });
       })
