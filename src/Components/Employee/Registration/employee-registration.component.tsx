@@ -33,7 +33,6 @@ export const EmployeeRegistrationForm: React.FC = () => {
   const [formIsComplete, setFormIsComplete] = useState<boolean>(false);
   const [errorInForm, setErrorInForm] = useState<boolean>(false);
   const [pfNumber, setPfNumber] = useState<number>();
-  const [update, setUpdate] = useState<boolean>(false);
   const [edited, setEdited] = useState<boolean>(false);
   const [editValues, setEditValues] = useState<Object>();
   const history = useHistory();
@@ -43,7 +42,7 @@ export const EmployeeRegistrationForm: React.FC = () => {
     values: EmployeeRegistrationFormProps,
     helpers: FormikHelpers<EmployeeRegistrationFormProps>,
   ) => {
-    update
+    editValues
       ? updateEmployeeInformation(values).then(
           (response) => {
             if (response.status === 200) {
@@ -84,7 +83,6 @@ export const EmployeeRegistrationForm: React.FC = () => {
           response.map((resp) => {
             Object.entries(resp).map((data) => {
               formik.setFieldValue(data[0], data[1]);
-              setUpdate(true);
               setEditValues(resp);
             });
           });
@@ -155,7 +153,7 @@ export const EmployeeRegistrationForm: React.FC = () => {
               <Form className={styles.form} onSubmit={formik.handleSubmit}>
                 <Row className={styles.header}>
                   <h4 ref={basicRef}>1. Basic info</h4>
-                  <Link to={update ? `/EmployeeProfile/${pf}` : '/Home'} className={styles.backBtn}>
+                  <Link to={editValues ? `/EmployeeProfile/${pf}` : '/Home'} className={styles.backBtn}>
                     Back
                   </Link>
                 </Row>
@@ -328,7 +326,7 @@ export const EmployeeRegistrationForm: React.FC = () => {
                   invalidText={formik.errors.nhif}
                 />
                 <Button className={styles.submitBtn} disabled={edited} type="submit">
-                  {update ? 'Update' : 'Save'}
+                  {editValues ? 'Update' : 'Save'}
                 </Button>
               </Form>
             </Column>
@@ -337,21 +335,23 @@ export const EmployeeRegistrationForm: React.FC = () => {
       </div>
       {formIsComplete && (
         <ToastNotification
-          title={update ? 'Data updated successfully' : 'Data saved successfully'}
+          title={editValues ? 'Data updated successfully' : 'Data saved successfully'}
           timeout={1000}
           className={styles.toast}
           subtitle={
-            update ? 'Employee registration data updated successfully' : 'Employee registration data saved successfully'
+            editValues
+              ? 'Employee registration data updated successfully'
+              : 'Employee registration data saved successfully'
           }
           kind="success"
         />
       )}
       {errorInForm && (
         <ToastNotification
-          title={update ? 'Error updating data' : 'Error saving data'}
+          title={editValues ? 'Error updating data' : 'Error saving data'}
           timeout={1000}
           className={styles.toast}
-          subtitle={update ? 'Employee registration data not updated' : 'Employee registration data not saved'}
+          subtitle={editValues ? 'Employee registration data not updated' : 'Employee registration data not saved'}
           kind="error"
         />
       )}

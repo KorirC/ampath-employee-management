@@ -1,54 +1,16 @@
 import React from 'react';
-import { Select, SelectItem, TextInput, Button, FormLabel, ToastNotification } from 'carbon-components-react';
-import { getBudgets, getCounties } from '../../commonResources/common.resource';
-import { useEffect, useMemo, useState } from 'react';
+import { Select, SelectItem, TextInput, Button, ToastNotification } from 'carbon-components-react';
+import { getBudgets } from '../../commonResources/common.resource';
+import { useState } from 'react';
 import styles from './dimensions.module.scss';
 import { addProgram } from './dimensions.resource';
-import { useHistory } from 'react-router-dom';
 import { Formik, Form, FormikHelpers } from 'formik';
 import { programInputProps, programValues } from './dimensions.types';
 import { programSchema } from './dimensions.validation';
 
 const Program: React.FC = () => {
-  const history = useHistory();
-  const [counties, setCounties] = React.useState([]);
-  const [budgets, setBudgets] = React.useState([]);
-  const [open, setOpen] = useState(true);
   const [dimensionCreated, setDimensionCreated] = useState<boolean>(false);
-  const [selectedValues, setSelectedValues] = React.useState({
-    budget: '',
-    county: '',
-  });
-
-  // const handleChange = (e: any) => {
-  //   setSelectedValues((current) => ({
-  //     ...current,
-  //     [e.target.id]: e.target.value,
-  //   }));
-  // };
-
-  useMemo(async () => {
-    await Promise.all([
-      getBudgets().then((res) => {
-        const results = res.data.map((budget: any) => {
-          return {
-            ...budget,
-            budgets: budget.nFame,
-          };
-        });
-        setBudgets(results);
-      }),
-      getCounties().then((res) => {
-        const results = res.data.map((county: any) => {
-          return {
-            ...county,
-            counties: county.name,
-          };
-        });
-        setCounties(results);
-      }),
-    ]);
-  }, []);
+  const { data: budget } = getBudgets();
 
   const onFormSubmit = (values: programInputProps, helpers: FormikHelpers<programInputProps>) => {
     console.log(values);
@@ -92,7 +54,7 @@ const Program: React.FC = () => {
               onChange={handleChange}
             >
               <SelectItem value={values.budget} onChange={handleChange} onBlur={handleBlur} text="Choose Below" />
-              {budgets.map((item: any, index: any) => (
+              {budget?.data?.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.budgetId} />
               ))}
             </Select>

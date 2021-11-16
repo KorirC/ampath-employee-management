@@ -1,54 +1,16 @@
 import React from 'react';
-import { Select, SelectItem, TextInput, Button, FormLabel, ToastNotification } from 'carbon-components-react';
-import { getBudgets, getCounties } from '../../commonResources/common.resource';
-import { useEffect, useMemo, useState } from 'react';
+import { Select, SelectItem, TextInput, Button, ToastNotification } from 'carbon-components-react';
+import { getCounties } from '../../commonResources/common.resource';
+import { useState } from 'react';
 import styles from './dimensions.module.scss';
 import { addSite } from './dimensions.resource';
-import { useHistory } from 'react-router-dom';
 import { Formik, Form, FormikHelpers } from 'formik';
 import { siteInputProps, siteValues } from './dimensions.types';
 import { siteSchema } from './dimensions.validation';
 
 const Site: React.FC = () => {
-  const history = useHistory();
-  const [counties, setCounties] = React.useState([]);
-  const [budgets, setBudgets] = React.useState([]);
-  const [open, setOpen] = useState(true);
   const [dimensionCreated, setDimensionCreated] = useState<boolean>(false);
-  const [selectedValues, setSelectedValues] = React.useState({
-    budget: '',
-    county: '',
-  });
-
-  // const handleChange = (e: any) => {
-  //   setSelectedValues((current) => ({
-  //     ...current,
-  //     [e.target.id]: e.target.value,
-  //   }));
-  // };
-
-  useMemo(async () => {
-    await Promise.all([
-      getBudgets().then((res) => {
-        const results = res.data.map((budget: any) => {
-          return {
-            ...budget,
-            budgets: budget.nFame,
-          };
-        });
-        setBudgets(results);
-      }),
-      getCounties().then((res) => {
-        const results = res.data.map((county: any) => {
-          return {
-            ...county,
-            counties: county.name,
-          };
-        });
-        setCounties(results);
-      }),
-    ]);
-  }, []);
+  const { data: county } = getCounties();
 
   const onFormSubmit = (values: siteInputProps, helpers: FormikHelpers<siteInputProps>) => {
     console.log(values);
@@ -90,7 +52,7 @@ const Site: React.FC = () => {
               onChange={handleChange}
             >
               <SelectItem value={values.county} onChange={handleChange} onBlur={handleBlur} text="Choose Below" />
-              {counties.map((item: any, index: any) => (
+              {county?.data?.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.countyId} />
               ))}
             </Select>

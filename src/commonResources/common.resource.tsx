@@ -1,65 +1,72 @@
 const token = sessionStorage.getItem('token');
+import useSWR from 'swr';
 import { useFetch } from '../globals/useFetch';
 
 const url = process.env.REACT_APP_URL;
-export const getCounties = async () => {
-  return await useFetch(`${url}/county`, {
-    headers: {
-      Authorization: `Bearer  ${token}`,
-    },
-  }).then((response) => {
-    return response.data;
-  });
+export const getCounties = () => {
+  const { data, isValidating, error } = useSWR(`${url}/county`, () =>
+    useFetch(`${url}/county`, {
+      headers: {
+        Authorization: `Bearer  ${token}`,
+      },
+    }).then((response) => response.data),
+  );
+  return { data, isValidating, error };
 };
 
-export const getDepartments = async () => {
-  return await useFetch(`${url}/department`, {
-    headers: {
-      Authorization: `Bearer  ${token}`,
-    },
-  }).then((response) => {
-    return response.data;
-  });
+export const getDepartments = () => {
+  const { data, isValidating, error } = useSWR(`${url}/department`, () =>
+    useFetch(`${url}/department`, {
+      headers: {
+        Authorization: `Bearer  ${token}`,
+      },
+    }).then((response) => response.data),
+  );
+  return { data, isValidating, error };
 };
 
-export const getProjects = async () => {
-  return await useFetch(`${url}/project`, {
-    headers: {
-      Authorization: `Bearer  ${token}`,
-    },
-  }).then((response) => {
-    return response.data;
-  });
+export const getProjects = () => {
+  const { data, isValidating, error } = useSWR(`${url}/project`, () =>
+    useFetch(`${url}/project`, {
+      headers: {
+        Authorization: `Bearer  ${token}`,
+      },
+    }).then((response) => response.data),
+  );
+  return { data, isValidating, error };
 };
 
-export const getPrograms = async () => {
-  return await useFetch(`${url}/program`, {
-    headers: {
-      Authorization: `Bearer  ${token}`,
-    },
-  }).then((response) => {
-    return response.data;
-  });
+export const getPrograms = () => {
+  const { data, isValidating, error } = useSWR(`${url}/program`, () =>
+    useFetch(`${url}/program`, {
+      headers: {
+        Authorization: `Bearer  ${token}`,
+      },
+    }).then((response) => response.data),
+  );
+  return { data, isValidating, error };
 };
 
-export const getSites = async () => {
-  return await useFetch(`${url}/site`, {
-    headers: {
-      Authorization: `Bearer  ${token}`,
-    },
-  }).then((response) => {
-    return response.data;
-  });
+export const getSites = () => {
+  const { data, isValidating, error } = useSWR(`${url}/site`, () =>
+    useFetch(`${url}/site`, {
+      headers: {
+        Authorization: `Bearer  ${token}`,
+      },
+    }).then((response) => response.data),
+  );
+  return { data, isValidating, error };
 };
 
-export const getBudgets = async () => {
-  return await useFetch(`${url}/budget`, {
-    headers: {
-      Authorization: `Bearer  ${token}`,
-    },
-  }).then((response) => {
-    return response.data;
-  });
+export const getBudgets = () => {
+  const { data, isValidating, error } = useSWR(`${url}/budget`, () =>
+    useFetch(`${url}/budget`, {
+      headers: {
+        Authorization: `Bearer  ${token}`,
+      },
+    }).then((response) => response.data),
+  );
+  return { data, isValidating, error };
 };
 
 export const trackEmployees = async () => {

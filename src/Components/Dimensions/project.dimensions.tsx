@@ -1,54 +1,14 @@
 import React from 'react';
 import { TextInput, Button, ToastNotification } from 'carbon-components-react';
-import { getBudgets, getCounties } from '../../commonResources/common.resource';
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import styles from './dimensions.module.scss';
 import { addProject } from './dimensions.resource';
-import { useHistory } from 'react-router-dom';
 import { Formik, Form, FormikHelpers } from 'formik';
 import { projectInputProps, projectValues } from './dimensions.types';
 import { projectSchema } from './dimensions.validation';
 
 const Project: React.FC = () => {
-  const history = useHistory();
-  const [counties, setCounties] = React.useState([]);
-  const [budgets, setBudgets] = React.useState([]);
-  const [open, setOpen] = useState(true);
   const [dimensionCreated, setDimensionCreated] = useState<boolean>(false);
-  const [selectedValues, setSelectedValues] = React.useState({
-    budget: '',
-    county: '',
-  });
-
-  // const handleChange = (e: any) => {
-  //   setSelectedValues((current) => ({
-  //     ...current,
-  //     [e.target.id]: e.target.value,
-  //   }));
-  // };
-
-  useMemo(async () => {
-    await Promise.all([
-      getBudgets().then((res) => {
-        const results = res.data.map((budget: any) => {
-          return {
-            ...budget,
-            budgets: budget.nFame,
-          };
-        });
-        setBudgets(results);
-      }),
-      getCounties().then((res) => {
-        const results = res.data.map((county: any) => {
-          return {
-            ...county,
-            counties: county.name,
-          };
-        });
-        setCounties(results);
-      }),
-    ]);
-  }, []);
 
   const onFormSubmit = (values: projectInputProps, helpers: FormikHelpers<projectInputProps>) => {
     console.log(values);

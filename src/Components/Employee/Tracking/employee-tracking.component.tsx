@@ -29,12 +29,6 @@ import {
 import { Link, useHistory, useParams } from 'react-router-dom';
 
 export const EmployeeTrackingForm: React.FC = () => {
-  const [project, setProject] = useState<Array<any>>([]);
-  const [department, setDepartment] = useState<Array<any>>();
-  const [site, setSite] = useState<Array<any>>();
-  const [county, setCounty] = useState<Array<any>>();
-  const [budget, setBudget] = useState<Array<any>>();
-  const [program, setProgram] = useState<Array<any>>();
   const [formSuccess, setFormSuccess] = useState<boolean>(false);
   const [formError, setFormError] = useState<boolean>(false);
   const [editValues, setEditValues] = useState<Object>();
@@ -43,6 +37,12 @@ export const EmployeeTrackingForm: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const history = useHistory();
   const { pfNumber } = useParams<{ pfNumber: string }>();
+  const { data: department } = getDepartments();
+  const { data: budget } = getBudgets();
+  const { data: county } = getCounties();
+  const { data: program } = getPrograms();
+  const { data: project } = getProjects();
+  const { data: site } = getSites();
 
   useEffect(() => {
     getEmployeeProfileInformation(pfNumber).then((response) => {
@@ -117,45 +117,6 @@ export const EmployeeTrackingForm: React.FC = () => {
     history.goBack();
   };
 
-  useMemo(() => {
-    getProjects().then((response) => {
-      let results = response?.data?.map((resp) => {
-        return resp;
-      });
-      setProject(results);
-    });
-    getDepartments().then((response) => {
-      let results = response?.data?.map((resp) => {
-        return resp;
-      });
-      setDepartment(results);
-    });
-    getSites().then((response) => {
-      let results = response?.data?.map((resp) => {
-        return resp;
-      });
-      setSite(results);
-    });
-    getCounties().then((response) => {
-      let results = response?.data?.map((resp) => {
-        return resp;
-      });
-      setCounty(results);
-    });
-    getBudgets().then((response) => {
-      let results = response?.data?.map((resp) => {
-        return resp;
-      });
-      setBudget(results);
-    });
-    getPrograms().then((response) => {
-      let results = response?.data?.map((resp) => {
-        return resp;
-      });
-      setProgram(results);
-    });
-  }, []);
-
   return (
     <>
       {formSuccess && (
@@ -196,7 +157,7 @@ export const EmployeeTrackingForm: React.FC = () => {
             value={formik.values.project}
           >
             <SelectItem text="--Choose project--" value="" />
-            {project?.map((item, index) => (
+            {project?.data?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.projectId} />
             ))}
           </Select>
@@ -213,7 +174,7 @@ export const EmployeeTrackingForm: React.FC = () => {
             value={formik.values.department}
           >
             <SelectItem text="--Choose department--" value="" />
-            {department?.map((item, index) => (
+            {department?.data?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.departmentId} />
             ))}
           </Select>
@@ -230,7 +191,7 @@ export const EmployeeTrackingForm: React.FC = () => {
             value={formik.values.site}
           >
             <SelectItem text="--Choose site--" value="" />
-            {site?.map((item, index) => (
+            {site?.data?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.siteId} />
             ))}
           </Select>
@@ -247,7 +208,7 @@ export const EmployeeTrackingForm: React.FC = () => {
             value={formik.values.county}
           >
             <SelectItem text="--Choose county--" value="" />
-            {county?.map((item, index) => (
+            {county?.data?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.countyId} />
             ))}
           </Select>
@@ -264,7 +225,7 @@ export const EmployeeTrackingForm: React.FC = () => {
             value={formik.values.countyBudget}
           >
             <SelectItem text="--Choose county budget--" value="" />
-            {budget?.map((item, index) => (
+            {budget?.data?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.budgetId} />
             ))}
           </Select>
@@ -281,7 +242,7 @@ export const EmployeeTrackingForm: React.FC = () => {
             value={formik.values.programArea}
           >
             <SelectItem text="--Choose program area--" value="" />
-            {program?.map((item, index) => (
+            {program?.data?.map((item, index) => (
               <SelectItem key={index} text={item.name} value={item.programId} />
             ))}
           </Select>

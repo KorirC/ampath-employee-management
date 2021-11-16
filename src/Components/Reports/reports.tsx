@@ -41,12 +41,6 @@ import { exportPDF } from './exportPDF';
 export const EmployeeStatusReport: React.FC = () => {
   const [firstRowIndex, setFirstRowIndex] = React.useState(0);
   const [currentPageSize, setCurrentPageSize] = React.useState(10);
-  const [counties, setCounties] = React.useState([]);
-  const [departments, setDepartments] = React.useState([]);
-  const [projects, setProjects] = React.useState([]);
-  const [budgets, setBudgets] = React.useState([]);
-  const [sites, setSites] = React.useState([]);
-  const [programs, setPrograms] = React.useState([]);
   const [report, setReport] = React.useState([]);
   const [selectedValues, setSelectedValues] = React.useState({
     department: '',
@@ -57,6 +51,12 @@ export const EmployeeStatusReport: React.FC = () => {
     contractStatus: '',
     programArea: '',
   });
+  const { data: department } = getDepartments();
+  const { data: budget } = getBudgets();
+  const { data: county } = getCounties();
+  const { data: program } = getPrograms();
+  const { data: project } = getProjects();
+  const { data: site } = getSites();
 
   const handleChange = (e: any) => {
     setSelectedValues((current) => ({
@@ -91,81 +91,6 @@ export const EmployeeStatusReport: React.FC = () => {
     ],
     [],
   );
-
-  useMemo(async () => {
-    await Promise.all([
-      getCounties().then((res) => {
-        const results = res.data.map((county: any) => {
-          return {
-            ...county,
-            counties: county.name,
-          };
-        });
-        setCounties(results);
-      }),
-      getDepartments().then((res) => {
-        const results = res.data.map((department: any) => {
-          return {
-            ...department,
-            departments: department.name,
-          };
-        });
-        setDepartments(results);
-      }),
-      getProjects().then((res) => {
-        const results = res.data.map((project: any) => {
-          return {
-            ...project,
-            projects: project.name,
-          };
-        });
-        setProjects(results);
-      }),
-      getBudgets().then((res) => {
-        const results = res.data.map((budget: any) => {
-          return {
-            ...budget,
-            budgets: budget.name,
-          };
-        });
-        setBudgets(results);
-      }),
-      getSites().then((res) => {
-        const results = res.data.map((site: any) => {
-          return {
-            ...site,
-            sites: site.name,
-          };
-        });
-        setSites(results);
-      }),
-      trackEmployees().then((res) => {
-        const results = res.data.map((report: any) => {
-          return {
-            id: report.pfNumber,
-            pfNumber: report.pfNumber,
-            name: `${report.firstName} ${report.middleName} ${report.lastName}`,
-            status: report.employeeStatus,
-            department: report.department,
-            project: report.project,
-            site: report.site,
-            county: report.county,
-            program: report.programArea,
-          };
-        });
-        setReport(results);
-      }),
-      getPrograms().then((res) => {
-        const results = res.data.map((program: any) => {
-          return {
-            ...program,
-            programs: program.name,
-          };
-        });
-        setPrograms(results);
-      }),
-    ]);
-  }, []);
 
   const handleReport = () => {
     getReport(selectedValues).then((res) => {
@@ -206,42 +131,42 @@ export const EmployeeStatusReport: React.FC = () => {
 
             <Select id="department" labelText="Department: " defaultValue="" onChange={handleChange}>
               <SelectItem value="" text="All" />
-              {departments.map((item: any, index: any) => (
+              {department?.data?.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
             <Select id="project" labelText="Project: " defaultValue="" onChange={handleChange}>
               <SelectItem value="" text="All" />
-              {projects.map((item: any, index: any) => (
+              {project?.data?.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
             <Select id="site" labelText="Site: " defaultValue="" onChange={handleChange}>
               <SelectItem value="" text="All" />
-              {sites.map((item: any, index: any) => (
+              {site?.data?.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
             <Select id="budget" labelText="Budget: " defaultValue="" onChange={handleChange}>
               <SelectItem value="" text="All" />
-              {budgets.map((item: any, index: any) => (
+              {budget?.data?.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
             <Select id="county" labelText="County: " defaultValue="" onChange={handleChange}>
               <SelectItem value="" text="All" />
-              {counties.map((item: any, index: any) => (
+              {county?.data?.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
 
             <Select id="programArea" labelText="Program Area: " defaultValue="" onChange={handleChange}>
               <SelectItem value="" text="All" />
-              {programs.map((item: any, index: any) => (
+              {program?.data?.map((item: any, index: any) => (
                 <SelectItem text={item.name} key={index} value={item.name} />
               ))}
             </Select>
