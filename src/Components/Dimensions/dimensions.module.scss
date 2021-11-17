@@ -1,17 +1,28 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 .heading {
     text-align: center;
     font-weight: bolder;
     margin-top: 20px;
     font-size: 30px;
     margin-bottom: 40px;
+    overflow-wrap: break-word ;
+    font-kerning: auto 
 }
   
 .form {
-    width:max-content;
-    margin: 10rem 20rem;
-    padding: clamp(15px, 5%, 50px);
+    width: 58%;
+    height: auto;
+    margin:0 auto;
+    padding: clamp(1.5rem, 2.5vw, 4rem);
     text-align: center;
-    border: thin ridge teal;
+    border: thin ridge teal;   
+    kerning: auto;
+    display: inline-flexbox;
 }
 
 .tabs{
@@ -20,6 +31,7 @@
 
 .btn {
     margin: 5px;
+    display:inline-flexbox;
 }
 
 .addUserBtn {
