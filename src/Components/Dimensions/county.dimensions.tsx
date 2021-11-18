@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Button, ToastNotification } from 'carbon-components-react';
+import { TextInput, Button, InlineNotification } from 'carbon-components-react';
 import { useState } from 'react';
 import styles from './dimensions.module.scss';
 import { addCounty } from './dimensions.resource';
@@ -26,7 +26,7 @@ const County: React.FC = () => {
 
   return (
     <>
-      {dimensionCreated && <ToastNotification title="Success!" timeout={5000} subtitle="County Added" kind="success" />}
+      {dimensionCreated && <InlineNotification title="Success!" subtitle="County Added" kind="success" />}
       <Formik validationSchema={countySchema} initialValues={countyValues} onSubmit={onFormSubmit}>
         {({ handleChange, setFieldValue, handleBlur, handleSubmit, values, touched, errors }) => (
           <Form onSubmit={handleSubmit}>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Button, ToastNotification } from 'carbon-components-react';
+import { TextInput, Button, InlineNotification } from 'carbon-components-react';
 import { useState } from 'react';
 import styles from './dimensions.module.scss';
 import { addDepartment } from './dimensions.resource';
@@ -26,9 +26,7 @@ const Department: React.FC = () => {
 
   return (
     <>
-      {dimensionCreated && (
-        <ToastNotification title="Success!" timeout={5000} subtitle="Department Added" kind="success" />
-      )}
+      {dimensionCreated && <InlineNotification title="Success!" subtitle="Department Added" kind="success" />}
       <Formik validationSchema={departmentSchema} initialValues={departmentValues} onSubmit={onFormSubmit}>
         {({ handleChange, setFieldValue, handleBlur, handleSubmit, values, touched, errors }) => (
           <Form onSubmit={handleSubmit}>

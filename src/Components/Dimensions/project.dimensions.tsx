@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Button, ToastNotification } from 'carbon-components-react';
+import { TextInput, Button, InlineNotification } from 'carbon-components-react';
 import { useState } from 'react';
 import styles from './dimensions.module.scss';
 import { addProject } from './dimensions.resource';
@@ -26,9 +26,7 @@ const Project: React.FC = () => {
 
   return (
     <>
-      {dimensionCreated && (
-        <ToastNotification title="Success!" timeout={5000} subtitle="Project Added" kind="success" />
-      )}
+      {dimensionCreated && <InlineNotification title="Success!" subtitle="Project Added" kind="success" />}
       <Formik validationSchema={projectSchema} initialValues={projectValues} onSubmit={onFormSubmit}>
         {({ handleChange, setFieldValue, handleBlur, handleSubmit, values, touched, errors }) => (
           <Form onSubmit={handleSubmit}>

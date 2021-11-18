@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, SelectItem, TextInput, Button, FormLabel, ToastNotification } from 'carbon-components-react';
+import { Select, SelectItem, TextInput, Button, InlineNotification } from 'carbon-components-react';
 import { getCounties } from '../../commonResources/common.resource';
 import { useState } from 'react';
 import styles from './dimensions.module.scss';
@@ -31,10 +31,8 @@ const Budgets: React.FC = () => {
 
   return (
     <>
-      {dimensionCreated && <ToastNotification title="Success!" timeout={5000} subtitle="Budget Added" kind="success" />}
-      {errorCode && (
-        <ToastNotification title="Error" timeout={5000} subtitle="Budget MFL Code In Use,Try Again" kind="warning" />
-      )}
+      {dimensionCreated && <InlineNotification title="Success!" subtitle="Budget Added" kind="success" />}
+      {errorCode && <InlineNotification title="Error" subtitle="Budget MFL Code In Use,Try Again" kind="warning" />}
       <Formik validationSchema={budgetSchema} initialValues={budgetValues} onSubmit={onFormSubmit}>
         {({ handleChange, setFieldValue, handleBlur, handleSubmit, values, touched, errors }) => (
           <Form onSubmit={handleSubmit}>
