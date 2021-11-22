@@ -132,7 +132,7 @@ const User: React.FC = () => {
     <>
       {users.length > 0 ? (
         <>
-          <DataTable rows={rows} headers={tableHeaders} useZebraStyles>
+          <DataTable rows={rows} headers={tableHeaders} isSortable useZebraStyles>
             {({
               rows,
               headers,
